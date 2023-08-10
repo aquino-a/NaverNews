@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NaverNews.Web", "NaverNews.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaverNews.Core", "NaverNews.Core\NaverNews.Core.csproj", "{6E4566C4-41C2-4E1B-B475-65A3EC997098}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaverNews.Core.Tests", "NaverNews.Core.Tests\NaverNews.Core.Tests.csproj", "{7366A046-099E-41B1-AE86-908A858C002D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{6E4566C4-41C2-4E1B-B475-65A3EC997098}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6E4566C4-41C2-4E1B-B475-65A3EC997098}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6E4566C4-41C2-4E1B-B475-65A3EC997098}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7366A046-099E-41B1-AE86-908A858C002D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7366A046-099E-41B1-AE86-908A858C002D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7366A046-099E-41B1-AE86-908A858C002D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7366A046-099E-41B1-AE86-908A858C002D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,6 +1,7 @@
 ﻿namespace NaverNews.Core
 {
-    internal enum NewsType
+    public enum NewsType
     {
+        Society = 102
     }
 }
