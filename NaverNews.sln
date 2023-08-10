@@ -5,9 +5,14 @@ VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NaverNews.Web", "NaverNews.Web\NaverNews.Web.csproj", "{C10D50B1-59F0-4200-8440-DC06087390C3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaverNews.Core", "NaverNews.Core\NaverNews.Core.csproj", "{6E4566C4-41C2-4E1B-B475-65A3EC997098}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NaverNews.Core", "NaverNews.Core\NaverNews.Core.csproj", "{6E4566C4-41C2-4E1B-B475-65A3EC997098}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NaverNews.Core.Tests", "NaverNews.Core.Tests\NaverNews.Core.Tests.csproj", "{7366A046-099E-41B1-AE86-908A858C002D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NaverNews.Core.Tests", "NaverNews.Core.Tests\NaverNews.Core.Tests.csproj", "{7366A046-099E-41B1-AE86-908A858C002D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{15A452BC-3498-4079-BDF5-0EDFA4C38391}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

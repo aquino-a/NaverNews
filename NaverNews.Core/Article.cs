@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
@@ -12,6 +11,8 @@ namespace NaverNews.Core
         public string ArticleUrl { get; internal set; }
         public int CommentCount { get; internal set; }
         public string ImageUrl { get; internal set; }
+
+        public bool IsOnTwitter { get; set; }
 
         [JsonIgnore]
         [NotMapped]
@@ -37,6 +38,8 @@ namespace NaverNews.Core
             }
         }
 
+        public string TranslatedSummary { get; set; }
+        public string TwitterUrl { get; set; }
         public NewsType Type { get; internal set; }
     }
 }
