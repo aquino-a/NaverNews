@@ -16,7 +16,7 @@
         public IEnumerable<Article> GetByTimeAndTotal(DateTime olderThan, int minimumTotal = 10, int count = 20)
         {
             return _articleContext.Articles
-                .OrderBy(a => a.Time)
+                .OrderByDescending(a => a.Time)
                 .Where(a => a.Time >= olderThan)
                 .Where(a => a.Total >= minimumTotal)
                 .Take(count);
