@@ -5,8 +5,6 @@
         private readonly ArticleDbContext _articleContext;
         private readonly NaverClient _client;
 
-        private Task<List<Article>> _currentTask;
-
         public ArticleService(NaverClient client, ArticleDbContext articleContext)
         {
             _client = client;
@@ -24,45 +22,32 @@
 
         public async Task<int> SearchArticles(NewsType type, int pages)
         {
-            try
+            var searchResult = new SearchResult { StartTime = DateTime.UtcNow };
+
+            var articles = await _client.GetArticles(type, pages);
+
+            articles.ForEach(a =>
             {
-                if (_currentTask != null)
+                var existingArticle = _articleContext.Find<Article>(a);
+                if (existingArticle == null)
                 {
-                    return -1;
+                    _articleContext.Add(a);
                 }
-
-                var searchResult = new SearchResult { StartTime = DateTime.UtcNow };
-
-                _currentTask = _client.GetArticles(type, pages);
-                var articles = await _currentTask;
-
-                articles.ForEach(a =>
+                else
                 {
-                    var existingArticle = _articleContext.Find<Article>(a);
-                    if (existingArticle == null)
-                    {
-                        _articleContext.Add(a);
-                    }
-                    else
-                    {
-                        existingArticle.CommentCount = a.CommentCount;
-                        existingArticle.ReplyCount = a.ReplyCount;
-                    }
-                });
+                    existingArticle.CommentCount = a.CommentCount;
+                    existingArticle.ReplyCount = a.ReplyCount;
+                }
+            });
 
-                var changeCount = await _articleContext.SaveChangesAsync();
-                searchResult.Count = changeCount;
-                searchResult.EndTime = DateTime.UtcNow;
+            var changeCount = await _articleContext.SaveChangesAsync();
+            searchResult.Count = changeCount;
+            searchResult.EndTime = DateTime.UtcNow;
 
-                _articleContext.SearchResults.Add(searchResult);
-                await _articleContext.SaveChangesAsync();
+            _articleContext.SearchResults.Add(searchResult);
+            await _articleContext.SaveChangesAsync();
 
-                return changeCount;
-            }
-            finally
-            {
-                _currentTask = null;
-            }
+            return changeCount;
         }
     }
 }

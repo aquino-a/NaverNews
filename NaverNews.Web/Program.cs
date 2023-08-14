@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
+using NaverNews.Core;
+using NaverNews.Web;
 using NaverNews.Web.Data;
 using NaverNews.Web.Models;
 
@@ -24,6 +26,12 @@ builder.Services.AddAuthentication()
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+builder.Services.AddHostedService<SearchService>();
+builder.Services.AddDbContext<ArticleDbContext>();
+builder.Services.AddScoped<ArticleService>();
+builder.Services.AddScoped<HttpClient>();
+builder.Services.AddScoped<NaverClient>();
 
 var app = builder.Build();
 
