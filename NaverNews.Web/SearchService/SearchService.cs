@@ -7,7 +7,7 @@ namespace NaverNews.Web
         private readonly ArticleService _articleService;
 
         public SearchService(ArticleService articleService, ILogger<TimedHostedService> logger)
-            : base(logger)
+            : base(TimeSpan.FromHours(1), logger)
         {
             _articleService = articleService;
         }
