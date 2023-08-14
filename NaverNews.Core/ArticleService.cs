@@ -31,6 +31,8 @@
                     return -1;
                 }
 
+                var searchResult = new SearchResult { StartTime = DateTime.UtcNow };
+
                 _currentTask = _client.GetArticles(type, pages);
                 var articles = await _currentTask;
 
@@ -49,6 +51,11 @@
                 });
 
                 var changeCount = await _articleContext.SaveChangesAsync();
+                searchResult.Count = changeCount;
+                searchResult.EndTime = DateTime.UtcNow;
+
+                _articleContext.SearchResults.Add(searchResult);
+                await _articleContext.SaveChangesAsync();
 
                 return changeCount;
             }
