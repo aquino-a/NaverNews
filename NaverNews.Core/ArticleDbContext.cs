@@ -10,5 +10,6 @@ namespace NaverNews.Core
     public class ArticleDbContext : DbContext
     {
         public DbSet<Article> Articles { get; set; }
+        public DbSet<SearchResult> SearchResults { get; set; }
     }
 }
