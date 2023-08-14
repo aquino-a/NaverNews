@@ -1,6 +1,6 @@
 ﻿namespace NaverNews.Web
 {
-    public abstract class TimedHostedService : BackgroundService
+    internal abstract class TimedHostedService : BackgroundService
     {
         protected readonly ILogger<TimedHostedService> _logger;
         private readonly TimeSpan _frequency;

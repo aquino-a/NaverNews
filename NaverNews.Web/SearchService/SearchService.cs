@@ -2,7 +2,7 @@
 
 namespace NaverNews.Web
 {
-    public class SearchService : TimedHostedService
+    internal class SearchService : TimedHostedService
     {
         private readonly ArticleService _articleService;
 

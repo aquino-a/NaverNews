@@ -15,7 +15,8 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-builder.Services.AddHostedService<SearchService>();
+builder.Services.AddHostedService<ConsumeScopedServiceHostedService<SearchService>>();
+builder.Services.AddScoped<SearchService>();
 builder.Services.AddDbContext<ArticleDbContext>();
 builder.Services.AddScoped<ArticleService>();
 builder.Services.AddScoped<HttpClient>();
