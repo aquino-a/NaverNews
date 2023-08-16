@@ -36,6 +36,23 @@
             return text;
         }
 
+        public IEnumerable<Article> GetByTimeAndTotal(DateTime olderThan, int minimumTotal = 10, int count = 20)
+        {
+            return _articleContext.Articles
+                .OrderByDescending(a => a.Time)
+                .Where(a => a.Time <= olderThan)
+                .Where(a => a.Total >= minimumTotal)
+                .Take(count);
+        }
+
+        public async Task<IEnumerable<SearchResult>> GetSearchResults(DateTime olderThanUtc, int count)
+        {
+            return _articleContext.SearchResults
+                .OrderByDescending(r => r.EndTime)
+                .Where(r => r.EndTime <= olderThanUtc)
+                .Take(count);
+        }
+
         public async Task<string> GetSummary(string articleId)
         {
             var article = await _articleContext.Articles.FindAsync(articleId);
@@ -60,15 +77,6 @@
             await _articleContext.SaveChangesAsync();
 
             return summary;
-        }
-
-        public IEnumerable<Article> GetByTimeAndTotal(DateTime olderThan, int minimumTotal = 10, int count = 20)
-        {
-            return _articleContext.Articles
-                .OrderByDescending(a => a.Time)
-                .Where(a => a.Time >= olderThan)
-                .Where(a => a.Total >= minimumTotal)
-                .Take(count);
         }
 
         public async Task<int> SearchArticles(NewsType type, int pages)
