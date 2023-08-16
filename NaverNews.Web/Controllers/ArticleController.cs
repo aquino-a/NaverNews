@@ -51,20 +51,20 @@ namespace NaverNews.Web.Controllers
             return Ok(text);
         }
 
-        [HttpPost("search")]
-        public async Task<IActionResult> StartSearch()
-        {
-            Task.Factory.StartNew(async () => await _articleService.SearchArticles(NewsType.Society, 20));
-
-            return Ok();
-        }
-
         [HttpPost("post")]
         public async Task<IActionResult> Post([FromQuery] string articleId)
         {
             var id = await _articleService.Post(articleId);
 
             return Ok(id);
+        }
+
+        [HttpPost("search")]
+        public async Task<IActionResult> StartSearch()
+        {
+            Task.Factory.StartNew(async () => await _articleService.SearchArticles(NewsType.Society, 20));
+
+            return Ok();
         }
     }
 }

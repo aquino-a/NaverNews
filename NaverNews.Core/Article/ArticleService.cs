@@ -95,6 +95,7 @@
                 throw new ArticleSummaryNotReadyException();
             }
 
+            await _twitterClient.Refresh();
             var id = await _twitterClient.Post(article.Summary);
 
             article.TwitterId = id;
