@@ -3,12 +3,37 @@
     public class ArticleService
     {
         private readonly ArticleDbContext _articleContext;
+        private readonly IChatGptService _chatGptService;
         private readonly NaverClient _client;
 
-        public ArticleService(NaverClient client, ArticleDbContext articleContext)
+        public ArticleService(NaverClient client,
+                              IChatGptService chatGptService,
+                              ArticleDbContext articleContext)
         {
             _client = client;
+            _chatGptService = chatGptService;
             _articleContext = articleContext;
+        }
+
+        public async Task<string> GetArticleText(string articleId)
+        {
+            var article = await _articleContext.Articles.FindAsync(articleId);
+            if (article == null)
+            {
+                throw new ArticleNotFoundException();
+            }
+
+            if (!string.IsNullOrWhiteSpace(article.Text))
+            {
+                return article.Text;
+            }
+
+            var text = await _client.GetArticleText(article);
+
+            article.Text = text;
+            await _articleContext.SaveChangesAsync();
+
+            return text;
         }
 
         public IEnumerable<Article> GetByTimeAndTotal(DateTime olderThan, int minimumTotal = 10, int count = 20)

@@ -8,7 +8,7 @@ namespace NaverNews.Core
     public class Article
     {
         public string ArticleId { get; set; }
-        public string ArticleUrl { get; internal set; }
+        public string ArticleUrl { get; set; }
         public int CommentCount { get; internal set; }
         public string ImageUrl { get; internal set; }
 
@@ -27,6 +27,7 @@ namespace NaverNews.Core
         public string OfficeId { get; internal set; }
         public int ReplyCount { get; internal set; }
         public string Summary { get; internal set; }
+        public string Text { get; internal set; }
         public DateTime Time { get; internal set; }
         public string Title { get; internal set; }
 

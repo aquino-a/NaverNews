@@ -1,4 +1,4 @@
-﻿using System.Net.Http.Headers;
+﻿using HtmlAgilityPack;
 using System.Text;
 using System.Text.Json.Nodes;
 
@@ -21,20 +21,6 @@ namespace NaverNews.Core
         public NaverClient(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
-            _httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("en-US"));
-            _httpClient.DefaultRequestHeaders.AcceptLanguage.Add(new StringWithQualityHeaderValue("en"));
-            _httpClient.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("gzip"));
-            _httpClient.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("deflate"));
-            _httpClient.DefaultRequestHeaders.AcceptEncoding.Add(new StringWithQualityHeaderValue("br"));
-            _httpClient.DefaultRequestHeaders.AcceptCharset.Add(new StringWithQualityHeaderValue("utf-8"));
-            _httpClient.DefaultRequestHeaders.Add("dnt", "1");
-            _httpClient.DefaultRequestHeaders.Referrer = new Uri("https://news.naver.com/main/main.naver?mode=LSD&mid=shm&sid1=102");
-            _httpClient.DefaultRequestHeaders.Add("Sec-Fetch-Dest", "empty");
-            _httpClient.DefaultRequestHeaders.Add("Sec-Fetch-Mode", "cors");
-            _httpClient.DefaultRequestHeaders.Add("Sec-Fetch-Site", "same-origin");
-            _httpClient.DefaultRequestHeaders.Add("Sec-Gpc", "1");
-            _httpClient.DefaultRequestHeaders.Add("Origin", "empty");
         }
 
         /// <summary>
@@ -63,6 +49,25 @@ namespace NaverNews.Core
             }
 
             return articles;
+        }
+
+        public async Task<string> GetArticleText(Article article)
+        {
+            var message = await _httpClient.GetAsync(article.ArticleUrl);
+            using (var stream = await message.Content.ReadAsStreamAsync())
+            {
+                var html = new HtmlDocument();
+                html.Load(stream);
+                var articleNode = html.DocumentNode.SelectSingleNode("//div[@id=\"contents\"]//article[@id='dic_area']");
+                if (articleNode == null)
+                {
+                    throw new ArticleNodeNotFoundException();
+                }
+
+                return articleNode
+                    .GetDirectInnerText()
+                    .Trim();
+            }
         }
 
         private void AddComments(List<Article> articles, string rawComments)

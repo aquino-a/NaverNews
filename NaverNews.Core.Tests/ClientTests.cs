@@ -2,11 +2,6 @@ namespace NaverNews.Core.Tests
 {
     public class ClientTests
     {
-        [SetUp]
-        public void Setup()
-        {
-        }
-
         [Test]
         public async Task GetArticlesTest()
         {
@@ -26,6 +21,27 @@ namespace NaverNews.Core.Tests
             Assert.That(firstArticle.Time, Is.Not.EqualTo(default(DateTime)));
             Assert.That(firstArticle.ImageUrl, Is.Not.Empty);
             Assert.That(firstArticle.ArticleUrl, Is.Not.Empty);
+        }
+
+        [Test]
+        public async Task GetArticleTextTest()
+        {
+            var article = new Article
+            {
+                ArticleUrl = "https://n.news.naver.com/mnews/article/023/0003781854?sid=102"
+            };
+
+            var nc = new NaverClient(new HttpClient());
+
+            var text = await nc.GetArticleText(article);
+
+            Assert.That(text, Is.Not.Null);
+            Assert.That(text.Length, Is.GreaterThan(1));
+        }
+
+        [SetUp]
+        public void Setup()
+        {
         }
     }
 }
