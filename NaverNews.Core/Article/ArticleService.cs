@@ -5,13 +5,16 @@
         private readonly ArticleDbContext _articleContext;
         private readonly IChatGptService _chatGptService;
         private readonly NaverClient _client;
+        private readonly TwitterClient _twitterClient;
 
         public ArticleService(NaverClient client,
                               IChatGptService chatGptService,
+                              TwitterClient twitterClient,
                               ArticleDbContext articleContext)
         {
             _client = client;
             _chatGptService = chatGptService;
+            _twitterClient = twitterClient;
             _articleContext = articleContext;
         }
 
@@ -63,7 +66,7 @@
 
             if (string.IsNullOrWhiteSpace(article.Text))
             {
-                throw new ArticleTextNotGottenException();
+                throw new ArticleTextNotReadyException();
             }
 
             if (!string.IsNullOrWhiteSpace(article.Summary))
@@ -77,6 +80,27 @@
             await _articleContext.SaveChangesAsync();
 
             return summary;
+        }
+
+        public async Task<string> Post(string articleId)
+        {
+            var article = await _articleContext.Articles.FindAsync(articleId);
+            if (article == null)
+            {
+                throw new ArticleNotFoundException();
+            }
+
+            if (!string.IsNullOrWhiteSpace(article.Summary))
+            {
+                throw new ArticleSummaryNotReadyException();
+            }
+
+            var id = await _twitterClient.Post(article.Summary);
+
+            article.TwitterId = id;
+            await _articleContext.SaveChangesAsync();
+
+            return id;
         }
 
         public async Task<int> SearchArticles(NewsType type, int pages)
