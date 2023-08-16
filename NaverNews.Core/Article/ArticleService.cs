@@ -36,6 +36,32 @@
             return text;
         }
 
+        public async Task<string> GetSummary(string articleId)
+        {
+            var article = await _articleContext.Articles.FindAsync(articleId);
+            if (article == null)
+            {
+                throw new ArticleNotFoundException();
+            }
+
+            if (string.IsNullOrWhiteSpace(article.Text))
+            {
+                throw new ArticleTextNotGottenException();
+            }
+
+            if (!string.IsNullOrWhiteSpace(article.Summary))
+            {
+                return article.Summary;
+            }
+
+            var summary = await _chatGptService.Summarize(article.Text);
+
+            article.Summary = summary;
+            await _articleContext.SaveChangesAsync();
+
+            return summary;
+        }
+
         public IEnumerable<Article> GetByTimeAndTotal(DateTime olderThan, int minimumTotal = 10, int count = 20)
         {
             return _articleContext.Articles
