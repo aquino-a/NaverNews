@@ -1,6 +1,5 @@
 ﻿using System.Net.Http.Json;
 using System.Text.Json.Nodes;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace NaverNews.Core
 {
@@ -34,6 +33,26 @@ namespace NaverNews.Core
             };
         }
 
+        //scopes required
+        //tweet.read
+        //tweet.write
+        //users.read
+        public async Task<string> Post(string postContent)
+        {
+            var json = new JsonObject();
+            json.Add("text", JsonValue.Create<string>(postContent));
+
+            var content = JsonContent.Create(json);
+
+            var response = await _httpClient.PostAsync(BASE_URL + "2/tweets", content);
+            response.EnsureSuccessStatusCode();
+
+            var raw = await response.Content.ReadAsStringAsync();
+            var root = JsonNode.Parse(raw);
+
+            return root["data"]["id"].ToString();
+        }
+
         public async Task Refresh()
         {
             var pairs = new Dictionary<string, string>()
@@ -61,26 +80,6 @@ namespace NaverNews.Core
 
             _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {Tokens.Access}");
-        }
-
-        //scopes required
-        //tweet.read
-        //tweet.write
-        //users.read
-        public async Task<string> Post(string postContent)
-        {
-            var json = new JsonObject();
-            json.Add("text", JsonValue.Create<string>(postContent));
-
-            var content = JsonContent.Create(json);
-
-            var response = await _httpClient.PostAsync(BASE_URL + "2/tweets", content);
-            response.EnsureSuccessStatusCode();
-
-            var raw = await response.Content.ReadAsStringAsync();
-            var root = JsonNode.Parse(raw);
-
-            return root["data"]["id"].ToString();
         }
     }
 }
