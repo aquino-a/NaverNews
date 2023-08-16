@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using NaverNews.Core;
 using NaverNews.Web;
 
@@ -19,10 +20,21 @@ if (!builder.Environment.IsDevelopment())
 {
     builder.Services.AddHostedService<ConsumeScopedServiceHostedService<SearchService>>();
     builder.Services.AddScoped<SearchService>();
+
+    builder.Services.AddScoped<IArticleService, ArticleService>();
+}
+else
+{
+    builder.Services.AddScoped<IArticleService>(sp =>
+    {
+        var articeService = new Mock<IArticleService>();
+        articeService.Setup(a => a.GetByTimeAndTotal(DateTime.Now, 10, 10)).Returns(Article.FakeArticles);
+
+        return articeService.Object;
+    });
 }
 
 builder.Services.AddDbContext<ArticleDbContext>();
-builder.Services.AddScoped<ArticleService>();
 builder.Services.AddScoped<HttpClient>();
 builder.Services.AddScoped<NaverClient>();
 

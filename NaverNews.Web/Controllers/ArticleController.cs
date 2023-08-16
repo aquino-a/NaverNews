@@ -7,10 +7,10 @@ namespace NaverNews.Web.Controllers
     [ApiController]
     public class ArticleController : ControllerBase
     {
-        private readonly ArticleService _articleService;
+        private readonly IArticleService _articleService;
         private readonly ILogger<ArticleController> _logger;
 
-        public ArticleController(ArticleService articleService, ILogger<ArticleController> logger)
+        public ArticleController(IArticleService articleService, ILogger<ArticleController> logger)
         {
             _articleService = articleService;
             _logger = logger;
