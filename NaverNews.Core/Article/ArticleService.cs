@@ -1,6 +1,6 @@
 ﻿namespace NaverNews.Core
 {
-    public class ArticleService
+    public class ArticleService : IArticleService
     {
         private readonly ArticleDbContext _articleContext;
         private readonly IChatGptService _chatGptService;
@@ -69,14 +69,14 @@
                 throw new ArticleTextNotReadyException();
             }
 
-            if (!string.IsNullOrWhiteSpace(article.Summary))
+            if (!string.IsNullOrWhiteSpace(article.TranslatedSummary))
             {
-                return article.Summary;
+                return article.TranslatedSummary;
             }
 
             var summary = await _chatGptService.Summarize(article.Text);
 
-            article.Summary = summary;
+            article.TranslatedSummary = summary;
             await _articleContext.SaveChangesAsync();
 
             return summary;
