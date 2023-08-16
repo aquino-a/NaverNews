@@ -58,5 +58,13 @@ namespace NaverNews.Web.Controllers
 
             return Ok();
         }
+
+        [HttpPost("post")]
+        public async Task<IActionResult> Post([FromQuery] string articleId)
+        {
+            var id = await _articleService.Post(articleId);
+
+            return Ok(id);
+        }
     }
 }
