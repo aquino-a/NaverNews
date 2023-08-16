@@ -39,7 +39,6 @@ namespace NaverNews.Core
             }
         }
 
-        public string TranslatedSummary { get; set; }
         public string TwitterId { get; internal set; }
         public string TwitterUrl { get; set; }
         public NewsType Type { get; internal set; }

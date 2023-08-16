@@ -1,3 +1,4 @@
+import { Articles } from "./components/Articles";
 import { Counter } from "./components/Counter";
 import { FetchData } from "./components/FetchData";
 import { Home } from "./components/Home";
@@ -16,6 +17,10 @@ const AppRoutes = [
         requireAuth: true,
         element: <FetchData />
     },
+    {
+        path: '/articles',
+        element: <Articles />
+    }
 ];
 
 export default AppRoutes;
