@@ -1,8 +1,8 @@
 ﻿namespace NaverNews.Core
 {
-    internal class Tokens
+    public class Tokens
     {
-        public string Refresh { get; internal set; }
-        public string Access { get; internal set; }
+        public string Refresh { get; set; }
+        public string Access { get; set; }
     }
 }

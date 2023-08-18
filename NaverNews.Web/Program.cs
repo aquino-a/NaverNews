@@ -10,6 +10,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration["Cosmos-Connection"] ?? throw new InvalidOperationException("Connection string 'Cosmos-Connection' not found.");
+var twitterClientId = builder.Configuration["Twitter:clientId"] ?? throw new InvalidOperationException("Twitter client id 'Twitter:clientId' not found.");
+var twitterTokens = new Tokens
+{
+    Access = builder.Configuration["Twitter:accessToken"] ?? throw new InvalidOperationException("Twitter refresh token 'Twitter:accessToken' not found."),
+    Refresh = builder.Configuration["Twitter:refreshToken"] ?? throw new InvalidOperationException("Twitter access token 'Twitter:refreshToken' not found.")
+};
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -18,9 +24,7 @@ builder.Services.AddRazorPages();
 
 if (!builder.Environment.IsDevelopment())
 {
-    builder.Services.AddHostedService<ConsumeScopedServiceHostedService<SearchAutoPostService>>();
-    builder.Services.AddScoped<SearchAutoPostService>();
-
+    builder.Services.AddHostedService<SearchAutoPostService>();
     builder.Services.AddScoped<IArticleService, ArticleService>();
 }
 else
@@ -35,8 +39,15 @@ else
 }
 
 builder.Services.AddDbContext<ArticleDbContext>(options => options.UseCosmos(connectionString, "news"));
-builder.Services.AddScoped<HttpClient>();
-builder.Services.AddScoped<NaverClient>();
+builder.Services.AddSingleton<HttpClient>();
+builder.Services.AddSingleton<NaverClient>();
+builder.Services.AddSingleton<TwitterClient>((sp) =>
+{
+    var tc = new TwitterClient(twitterClientId, sp.GetRequiredService<HttpClient>());
+    tc.Tokens = twitterTokens;
+
+    return tc;
+});
 
 var app = builder.Build();
 

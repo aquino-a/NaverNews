@@ -6,7 +6,6 @@ namespace NaverNews.Core
     public class TwitterClient
     {
         private const string BASE_URL = "https://api.twitter.com/";
-        private const string REFRESH_PATH = "./refresh.token";
         private readonly string _clientId;
         private readonly HttpClient _httpClient;
 
@@ -16,22 +15,7 @@ namespace NaverNews.Core
             _httpClient = httpClient;
         }
 
-        internal Tokens Tokens { get; set; }
-
-        public async Task LoadRefreshToken()
-        {
-            if (!File.Exists(REFRESH_PATH))
-            {
-                return;
-            }
-
-            var refresh = await File.ReadAllTextAsync(REFRESH_PATH);
-
-            Tokens = new Tokens
-            {
-                Refresh = refresh
-            };
-        }
+        public Tokens Tokens { get; set; }
 
         //scopes required
         //tweet.read
@@ -75,8 +59,6 @@ namespace NaverNews.Core
                 Refresh = root["refresh_token"].ToString(),
                 Access = root["access_token"].ToString()
             };
-
-            await File.WriteAllTextAsync(REFRESH_PATH, Tokens.Refresh);
 
             _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {Tokens.Access}");
