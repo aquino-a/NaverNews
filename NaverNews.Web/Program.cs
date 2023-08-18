@@ -9,7 +9,7 @@ using NaverNews.Web;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration["Cosmos-Connection"] ?? throw new InvalidOperationException("Connection string 'Cosmos-Connection' not found.");
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
@@ -34,11 +34,17 @@ else
     });
 }
 
-builder.Services.AddDbContext<ArticleDbContext>();
+builder.Services.AddDbContext<ArticleDbContext>(options => options.UseCosmos(connectionString, "news"));
 builder.Services.AddScoped<HttpClient>();
 builder.Services.AddScoped<NaverClient>();
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var articleContext = scope.ServiceProvider.GetRequiredService<ArticleDbContext>();
+    await articleContext.Database.EnsureCreatedAsync();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -58,11 +64,6 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller}/{action=Index}/{id?}");
 app.MapRazorPages();
-
-app.MapFallbackToFile("index.html");
 
 app.Run();
