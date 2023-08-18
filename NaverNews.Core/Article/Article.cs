@@ -43,6 +43,7 @@ namespace NaverNews.Core
         public string TwitterId { get; internal set; }
         public string TwitterUrl { get; set; }
         public NewsType Type { get; internal set; }
+        public bool WasAutoPosted { get; set; }
 
         public static IEnumerable<Article> FakeArticles()
         {

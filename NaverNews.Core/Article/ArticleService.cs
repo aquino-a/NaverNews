@@ -1,8 +1,11 @@
-﻿namespace NaverNews.Core
+﻿using Microsoft.Extensions.Logging;
+
+namespace NaverNews.Core
 {
     public class ArticleService : IArticleService
     {
         private readonly ArticleDbContext _articleContext;
+        private readonly ILogger<ArticleService> _logger;
         private readonly IChatGptService _chatGptService;
         private readonly NaverClient _client;
         private readonly TwitterClient _twitterClient;
@@ -10,12 +13,43 @@
         public ArticleService(NaverClient client,
                               IChatGptService chatGptService,
                               TwitterClient twitterClient,
-                              ArticleDbContext articleContext)
+                              ArticleDbContext articleContext,
+                              ILogger<ArticleService> logger)
         {
             _client = client;
             _chatGptService = chatGptService;
             _twitterClient = twitterClient;
             _articleContext = articleContext;
+            _logger = logger;
+        }
+
+        public int SkipThreshhold { get; set; } = 50;
+        public int SearchPageCount { get; set; } = 20;
+        public int EngagementMinimum { get; set; } = 200;
+
+        public async Task AutoPost()
+        {
+            var count = await SearchArticles(NewsType.Society, SearchPageCount);
+
+            var article = _articleContext.Articles
+                .OrderByDescending(a => a.Time)
+                .TakeWhile(a => !a.WasAutoPosted)
+                .Where(a => a.Total >= EngagementMinimum)
+                .MaxBy(a => a.Total);
+
+            if (article == null)
+            {
+                _logger.LogInformation($"No article since last post met engagement minimum. [{EngagementMinimum}]");
+                return;
+            }
+
+            await _twitterClient.Refresh();
+            var id = await _twitterClient.Post(article.Summary);
+
+            article.WasAutoPosted = true;
+            article.TwitterId = id;
+            article.IsOnTwitter = true;
+            await _articleContext.SaveChangesAsync();
         }
 
         public async Task<string> GetArticleText(string articleId)
@@ -99,6 +133,7 @@
             var id = await _twitterClient.Post(article.Summary);
 
             article.TwitterId = id;
+            article.IsOnTwitter = true;
             await _articleContext.SaveChangesAsync();
 
             return id;
@@ -109,6 +144,7 @@
             var searchResult = new SearchResult { StartTime = DateTime.UtcNow };
 
             var articles = await _client.GetArticles(type, pages);
+            articles = articles.Where(a => a.Total >= SkipThreshhold).ToList();
 
             articles.ForEach(a =>
             {

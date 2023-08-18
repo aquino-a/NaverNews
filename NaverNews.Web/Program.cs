@@ -18,8 +18,8 @@ builder.Services.AddRazorPages();
 
 if (!builder.Environment.IsDevelopment())
 {
-    builder.Services.AddHostedService<ConsumeScopedServiceHostedService<SearchService>>();
-    builder.Services.AddScoped<SearchService>();
+    builder.Services.AddHostedService<ConsumeScopedServiceHostedService<SearchAutoPostService>>();
+    builder.Services.AddScoped<SearchAutoPostService>();
 
     builder.Services.AddScoped<IArticleService, ArticleService>();
 }

@@ -2,11 +2,11 @@
 
 namespace NaverNews.Web
 {
-    internal class SearchService : TimedHostedService
+    internal class SearchAutoPostService : TimedHostedService
     {
         private readonly ArticleService _articleService;
 
-        public SearchService(ArticleService articleService, ILogger<TimedHostedService> logger)
+        public SearchAutoPostService(ArticleService articleService, ILogger<TimedHostedService> logger)
             : base(TimeSpan.FromHours(1), logger)
         {
             _articleService = articleService;
@@ -16,11 +16,11 @@ namespace NaverNews.Web
         {
             try
             {
-                await _articleService.SearchArticles(NewsType.Society, 20);
+                await _articleService.AutoPost();
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Problem searching articles.");
+                _logger.LogError(e, "Problem autoposting articles.");
             }
         }
     }
