@@ -31,25 +31,28 @@ namespace NaverNews.Core
         {
             var count = await SearchArticles(NewsType.Society, SearchPageCount);
 
-            var article = _articleContext.Articles
+            var articles = _articleContext.Articles
                 .OrderByDescending(a => a.Time)
                 .TakeWhile(a => !a.WasAutoPosted)
                 .Where(a => a.Total >= EngagementMinimum)
-                .MaxBy(a => a.Total);
+                .ToList();
 
-            if (article == null)
+            if (articles == null || articles.Count == 0)
             {
                 _logger.LogInformation($"No article since last post met engagement minimum. [{EngagementMinimum}]");
                 return;
             }
 
             await _twitterClient.Refresh();
-            var id = await _twitterClient.Post(article.Summary);
+            foreach (var article in articles)
+            {
+                var id = await _twitterClient.Post(article.Summary);
 
-            article.WasAutoPosted = true;
-            article.TwitterId = id;
-            article.IsOnTwitter = true;
-            await _articleContext.SaveChangesAsync();
+                article.WasAutoPosted = true;
+                article.TwitterId = id;
+                article.IsOnTwitter = true;
+                await _articleContext.SaveChangesAsync();
+            }
         }
 
         public async Task<string> GetArticleText(string articleId)
