@@ -33,9 +33,10 @@ namespace NaverNews.Core
             var count = await SearchArticles(NewsType.Society, SearchPageCount);
             _logger.LogInformation($"Found {count} new articles.");
 
+            var lastTime = GetLastAutoPostTime();
+
             var articles = _articleContext.Articles
-                .OrderByDescending(a => a.Time)
-                .TakeWhile(a => !a.WasAutoPosted)
+                .Where(a => a.Time >= lastTime)
                 .Where(a => a.Total >= EngagementMinimum)
                 .ToList();
 
@@ -50,16 +51,7 @@ namespace NaverNews.Core
             await _twitterClient.Refresh();
             foreach (var article in articles)
             {
-                await GetArticleText(article);
-                await GetSummary(article);
-                var id = await _twitterClient.Post(article.Summary);
-
-                article.WasAutoPosted = true;
-                article.TwitterId = id;
-                article.IsOnTwitter = true;
-                await _articleContext.SaveChangesAsync();
-
-                _logger.LogInformation($"Posted article ({article.ArticleUrl}) to twitter. ({article.TwitterId}");
+                await AutoPost(article);
             }
         }
 
@@ -156,6 +148,20 @@ namespace NaverNews.Core
             return changeCount;
         }
 
+        private async Task AutoPost(Article article)
+        {
+            await GetArticleText(article);
+            await GetSummary(article);
+            var id = await _twitterClient.Post(article.Summary);
+
+            article.WasAutoPosted = true;
+            article.TwitterId = id;
+            article.IsOnTwitter = true;
+            await _articleContext.SaveChangesAsync();
+
+            _logger.LogInformation($"Posted article ({article.ArticleUrl}) to twitter. ({article.TwitterId}");
+        }
+
         private async Task<string> GetArticleText(Article article)
         {
             if (!string.IsNullOrWhiteSpace(article.Text))
@@ -169,6 +175,22 @@ namespace NaverNews.Core
             await _articleContext.SaveChangesAsync();
 
             return text;
+        }
+
+        private DateTime GetLastAutoPostTime()
+        {
+            var lastPost = _articleContext.Articles
+                .Where(a => a.WasAutoPosted)
+                .OrderByDescending(a => a.Time)
+                .FirstOrDefault();
+
+            _logger.LogInformation($"Last auto-posted article was {lastPost?.ArticleId}. ({lastPost?.ArticleUrl})");
+
+            var lastTime = lastPost == null
+                ? default(DateTime)
+                : lastPost.Time;
+
+            return lastTime;
         }
 
         private async Task<string> GetSummary(Article article)
