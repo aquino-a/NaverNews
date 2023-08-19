@@ -46,6 +46,8 @@ namespace NaverNews.Core
             await _twitterClient.Refresh();
             foreach (var article in articles)
             {
+                await GetArticleText(article);
+                await GetSummary(article);
                 var id = await _twitterClient.Post(article.Summary);
 
                 article.WasAutoPosted = true;
@@ -63,17 +65,7 @@ namespace NaverNews.Core
                 throw new ArticleNotFoundException();
             }
 
-            if (!string.IsNullOrWhiteSpace(article.Text))
-            {
-                return article.Text;
-            }
-
-            var text = await _client.GetArticleText(article);
-
-            article.Text = text;
-            await _articleContext.SaveChangesAsync();
-
-            return text;
+            return await GetArticleText(article);
         }
 
         public IEnumerable<Article> GetByTimeAndTotal(DateTime olderThan, int minimumTotal = 10, int count = 20)
@@ -101,22 +93,7 @@ namespace NaverNews.Core
                 throw new ArticleNotFoundException();
             }
 
-            if (string.IsNullOrWhiteSpace(article.Text))
-            {
-                throw new ArticleTextNotReadyException();
-            }
-
-            if (!string.IsNullOrWhiteSpace(article.TranslatedSummary))
-            {
-                return article.TranslatedSummary;
-            }
-
-            var summary = await _chatGptService.Summarize(article.Text);
-
-            article.TranslatedSummary = summary;
-            await _articleContext.SaveChangesAsync();
-
-            return summary;
+            return await GetSummary(article);
         }
 
         public async Task<string> Post(string articleId)
@@ -171,6 +148,41 @@ namespace NaverNews.Core
             await _articleContext.SaveChangesAsync();
 
             return changeCount;
+        }
+
+        private async Task<string> GetArticleText(Article article)
+        {
+            if (!string.IsNullOrWhiteSpace(article.Text))
+            {
+                return article.Text;
+            }
+
+            var text = await _client.GetArticleText(article);
+
+            article.Text = text;
+            await _articleContext.SaveChangesAsync();
+
+            return text;
+        }
+
+        private async Task<string> GetSummary(Article article)
+        {
+            if (string.IsNullOrWhiteSpace(article.Text))
+            {
+                throw new ArticleTextNotReadyException();
+            }
+
+            if (!string.IsNullOrWhiteSpace(article.TranslatedSummary))
+            {
+                return article.TranslatedSummary;
+            }
+
+            var summary = await _chatGptService.Summarize(article.Text);
+
+            article.TranslatedSummary = summary;
+            await _articleContext.SaveChangesAsync();
+
+            return summary;
         }
     }
 }
