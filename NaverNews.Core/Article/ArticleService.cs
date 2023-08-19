@@ -37,7 +37,7 @@ namespace NaverNews.Core
 
             var articles = _articleContext.Articles
                 .Where(a => a.Time >= lastTime)
-                .Where(a => a.Total >= EngagementMinimum)
+                .Where(a => a.ReplyCount + a.CommentCount >= EngagementMinimum)
                 .ToList();
 
             if (articles == null || articles.Count == 0)
