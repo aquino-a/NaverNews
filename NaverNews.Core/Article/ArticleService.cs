@@ -134,7 +134,7 @@ namespace NaverNews.Core
 
             articles.ForEach(a =>
             {
-                var existingArticle = _articleContext.Find<Article>(a);
+                var existingArticle = _articleContext.Find<Article>(a.ArticleId);
                 if (existingArticle == null)
                 {
                     _articleContext.Add(a);

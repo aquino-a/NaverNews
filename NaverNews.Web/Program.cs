@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var connectionString = builder.Configuration["Cosmos-Connection"] ?? throw new InvalidOperationException("Connection string 'Cosmos-Connection' not found.");
+var chatGptApiKey = builder.Configuration["ChatGpt:apiKey"] ?? throw new InvalidOperationException("ChatGpt Api key 'ChatGpt:apiKey' not found.");
 var twitterClientId = builder.Configuration["Twitter:clientId"] ?? throw new InvalidOperationException("Twitter client id 'Twitter:clientId' not found.");
 var twitterTokens = new Tokens
 {
@@ -22,25 +23,13 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-if (!builder.Environment.IsDevelopment())
-{
-    builder.Services.AddHostedService<SearchAutoPostService>();
-    builder.Services.AddSingleton<IArticleService, ArticleService>();
-}
-else
-{
-    builder.Services.AddScoped<IArticleService>(sp =>
-    {
-        var articeService = new Mock<IArticleService>();
-        articeService.Setup(a => a.GetByTimeAndTotal(DateTime.Now, 10, 10)).Returns(Article.FakeArticles);
+builder.Services.AddHostedService<SearchAutoPostService>();
+builder.Services.AddSingleton<IArticleService, ArticleService>();
 
-        return articeService.Object;
-    });
-}
-
-builder.Services.AddDbContext<ArticleDbContext>(options => options.UseCosmos(connectionString, "news"));
+builder.Services.AddDbContext<ArticleDbContext>(options => options.UseCosmos(connectionString, "news"), ServiceLifetime.Singleton);
 builder.Services.AddSingleton<HttpClient>();
 builder.Services.AddSingleton<NaverClient>();
+builder.Services.AddSingleton<IChatGptService, ChatGptService>(sp => new ChatGptService(sp.GetRequiredService<HttpClient>(), chatGptApiKey));
 builder.Services.AddSingleton<TwitterClient>((sp) =>
 {
     var tc = new TwitterClient(twitterClientId, sp.GetRequiredService<HttpClient>());
@@ -49,13 +38,12 @@ builder.Services.AddSingleton<TwitterClient>((sp) =>
     return tc;
 });
 
+
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var articleContext = scope.ServiceProvider.GetRequiredService<ArticleDbContext>();
-    await articleContext.Database.EnsureCreatedAsync();
-}
+var articleContext = app.Services.GetRequiredService<ArticleDbContext>();
+await articleContext.Database.EnsureCreatedAsync();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

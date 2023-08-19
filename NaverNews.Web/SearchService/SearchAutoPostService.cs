@@ -4,9 +4,9 @@ namespace NaverNews.Web
 {
     internal class SearchAutoPostService : TimedHostedService
     {
-        private readonly ArticleService _articleService;
+        private readonly IArticleService _articleService;
 
-        public SearchAutoPostService(ArticleService articleService, ILogger<TimedHostedService> logger)
+        public SearchAutoPostService(IArticleService articleService, ILogger<TimedHostedService> logger)
             : base(TimeSpan.FromHours(1), logger)
         {
             _articleService = articleService;
