@@ -25,7 +25,7 @@ builder.Services.AddRazorPages();
 if (!builder.Environment.IsDevelopment())
 {
     builder.Services.AddHostedService<SearchAutoPostService>();
-    builder.Services.AddScoped<IArticleService, ArticleService>();
+    builder.Services.AddSingleton<IArticleService, ArticleService>();
 }
 else
 {
