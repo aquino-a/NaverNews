@@ -27,7 +27,7 @@ builder.Services.AddHostedService<SearchAutoPostService>();
 builder.Services.AddSingleton<IArticleService, ArticleService>();
 
 builder.Services.AddDbContext<ArticleDbContext>(options => options.UseCosmos(connectionString, "news"), ServiceLifetime.Singleton);
-builder.Services.AddSingleton<HttpClient>();
+builder.Services.AddTransient<HttpClient>();
 builder.Services.AddSingleton<NaverClient>();
 builder.Services.AddSingleton<IChatGptService, ChatGptService>(sp => new ChatGptService(sp.GetRequiredService<HttpClient>(), chatGptApiKey));
 builder.Services.AddSingleton<TwitterClient>((sp) =>
