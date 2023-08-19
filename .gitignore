@@ -363,3 +363,5 @@ MigrationBackup/
 FodyWeavers.xsd
 /NaverNews.Web/db.db*
 .config*
+
+.vscode*
