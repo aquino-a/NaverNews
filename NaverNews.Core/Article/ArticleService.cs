@@ -29,7 +29,9 @@ namespace NaverNews.Core
 
         public async Task AutoPost()
         {
+            _logger.LogInformation($"Starting auto post for {NewsType.Society}");
             var count = await SearchArticles(NewsType.Society, SearchPageCount);
+            _logger.LogInformation($"Found {count} new articles.");
 
             var articles = _articleContext.Articles
                 .OrderByDescending(a => a.Time)
@@ -43,6 +45,8 @@ namespace NaverNews.Core
                 return;
             }
 
+            _logger.LogInformation($"Found {articles.Count} articles that meet the minimum. [{EngagementMinimum}]");
+
             await _twitterClient.Refresh();
             foreach (var article in articles)
             {
@@ -54,6 +58,8 @@ namespace NaverNews.Core
                 article.TwitterId = id;
                 article.IsOnTwitter = true;
                 await _articleContext.SaveChangesAsync();
+
+                _logger.LogInformation($"Posted article ({article.ArticleUrl}) to twitter. ({article.TwitterId}");
             }
         }
 
