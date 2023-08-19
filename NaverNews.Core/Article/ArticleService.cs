@@ -25,7 +25,7 @@ namespace NaverNews.Core
 
         public int SkipThreshhold { get; set; } = 50;
         public int SearchPageCount { get; set; } = 20;
-        public int EngagementMinimum { get; set; } = 200;
+        public int EngagementMinimum { get; set; } = 1000;
 
         public async Task AutoPost()
         {
