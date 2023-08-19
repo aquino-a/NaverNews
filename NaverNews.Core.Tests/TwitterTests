@@ -1,0 +1,34 @@
+using Microsoft.Extensions.Configuration;
+
+namespace NaverNews.Core.Tests
+{
+    [TestFixture]
+    public class TwitterTests
+    {
+
+        private IConfiguration _configuration;
+
+        [Test]
+        public async Task RefreshTest()
+        {
+            var httpClient = new HttpClient();
+            var tc = new TwitterClient(_configuration["Twitter:clientId"]!, httpClient);
+            tc.Tokens = new Tokens
+            {
+                Refresh = _configuration["Twitter:refreshToken"]!
+            };
+
+            await tc.Refresh();
+            Assert.Pass();
+        }
+
+        [SetUp]
+        public void Setup()
+        {
+            _configuration = new ConfigurationBuilder()
+                .SetBasePath(TestContext.CurrentContext.TestDirectory)
+                .AddUserSecrets("30334a78-31c6-4674-a662-4d7f4620eec8")
+                .Build();
+        }
+    }
+}
