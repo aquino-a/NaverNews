@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration["Cosmos-Connection"] ?? throw new InvalidOperationException("Connection string 'Cosmos-Connection' not found.");
 var chatGptApiKey = builder.Configuration["ChatGpt:apiKey"] ?? throw new InvalidOperationException("ChatGpt Api key 'ChatGpt:apiKey' not found.");
 var twitterClientId = builder.Configuration["Twitter:clientId"] ?? throw new InvalidOperationException("Twitter client id 'Twitter:clientId' not found.");
+var twitterClientSecret = builder.Configuration["Twitter:clientSecret"] ?? throw new InvalidOperationException("Twitter client secret 'Twitter:clientSecret' not found.");
 var twitterTokens = new Tokens
 {
     Access = builder.Configuration["Twitter:accessToken"] ?? throw new InvalidOperationException("Twitter refresh token 'Twitter:accessToken' not found."),
@@ -32,7 +33,7 @@ builder.Services.AddSingleton<NaverClient>();
 builder.Services.AddSingleton<IChatGptService, ChatGptService>(sp => new ChatGptService(sp.GetRequiredService<HttpClient>(), chatGptApiKey));
 builder.Services.AddSingleton<TwitterClient>((sp) =>
 {
-    var tc = new TwitterClient(twitterClientId, sp.GetRequiredService<HttpClient>());
+    var tc = new TwitterClient(twitterClientId, twitterClientSecret, sp.GetRequiredService<HttpClient>());
     tc.Tokens = twitterTokens;
 
     return tc;

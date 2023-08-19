@@ -1,4 +1,6 @@
-﻿using System.Net.Http.Json;
+﻿using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text;
 using System.Text.Json.Nodes;
 
 namespace NaverNews.Core
@@ -6,12 +8,16 @@ namespace NaverNews.Core
     public class TwitterClient
     {
         private const string BASE_URL = "https://api.twitter.com/";
+        private readonly AuthenticationHeaderValue _basicAuth;
         private readonly string _clientId;
+        private readonly string _clientSecret;
         private readonly HttpClient _httpClient;
 
-        public TwitterClient(string clientId, HttpClient httpClient)
+        public TwitterClient(string clientId, string clientSecret, HttpClient httpClient)
         {
             _clientId = clientId;
+            _clientSecret = clientSecret;
+            _basicAuth = CreateBasicHeader(clientId, clientSecret);
             _httpClient = httpClient;
         }
 
@@ -42,16 +48,16 @@ namespace NaverNews.Core
             var pairs = new Dictionary<string, string>()
             {
                 { "refresh_token", Tokens.Refresh },
-                { "grant_type", "refresh_token" },
-                { "client_id", _clientId },
+                { "grant_type", "refresh_token" }
             };
 
             var content = new FormUrlEncodedContent(pairs);
 
+            _httpClient.DefaultRequestHeaders.Authorization = _basicAuth;
             var response = await _httpClient.PostAsync(BASE_URL + "2/oauth2/token", content);
+            var json = await response.Content.ReadAsStringAsync();
             response.EnsureSuccessStatusCode();
 
-            var json = await response.Content.ReadAsStringAsync();
             var root = JsonNode.Parse(json);
 
             Tokens = new Tokens
@@ -61,7 +67,14 @@ namespace NaverNews.Core
             };
 
             _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {Tokens.Access}");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.Access);
+        }
+
+        private AuthenticationHeaderValue CreateBasicHeader(string clientId, string clientSecret)
+        {
+            var encodedString = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}"));
+
+            return new AuthenticationHeaderValue("Basic", encodedString);
         }
     }
 }
