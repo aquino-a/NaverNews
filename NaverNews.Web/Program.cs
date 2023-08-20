@@ -20,6 +20,13 @@ var engagementMinimum = builder.Configuration.GetValue<int>("Article:engagementM
 var searchPageCount = builder.Configuration.GetValue<int>("Article:searchPageCount");
 var skipThreshhold = builder.Configuration.GetValue<int>("Article:skipThreshhold");
 
+builder.Services.AddLogging(b =>
+{
+    b.AddConsole();
+    b.AddDebug();
+    b.AddAzureWebAppDiagnostics();
+});
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddControllersWithViews();
@@ -52,13 +59,6 @@ builder.Services.AddSingleton<TwitterClient>((sp) =>
     tc.Tokens = twitterTokens;
 
     return tc;
-});
-
-builder.Services.AddLogging(b =>
-{
-    b.AddConsole();
-    b.AddDebug();
-    b.AddAzureWebAppDiagnostics();
 });
 
 var app = builder.Build();
