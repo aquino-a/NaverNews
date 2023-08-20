@@ -105,13 +105,13 @@ namespace NaverNews.Core
                 throw new ArticleNotFoundException();
             }
 
-            if (!string.IsNullOrWhiteSpace(article.Summary))
+            if (!string.IsNullOrWhiteSpace(article.TranslatedSummary))
             {
                 throw new ArticleSummaryNotReadyException();
             }
 
             await _twitterClient.Refresh();
-            var id = await _twitterClient.Post(article.Summary);
+            var id = await _twitterClient.Post(article.TranslatedSummary);
 
             article.TwitterId = id;
             article.IsOnTwitter = true;
