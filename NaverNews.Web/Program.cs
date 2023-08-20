@@ -50,7 +50,10 @@ builder.Services.AddSingleton<NaverClient>();
 builder.Services.AddSingleton<IChatGptService, ChatGptService>(sp => new ChatGptService(sp.GetRequiredService<HttpClient>(), chatGptApiKey));
 builder.Services.AddSingleton<TwitterClient>((sp) =>
 {
-    var tc = new TwitterClient(twitterClientId, twitterClientSecret, sp.GetRequiredService<HttpClient>());
+    var tc = new TwitterClient(twitterClientId,
+                               twitterClientSecret,
+                               sp.GetRequiredService<HttpClient>(),
+                               sp.GetRequiredService<ILogger<TwitterClient>>());
     tc.Tokens = twitterTokens;
 
     return tc;
