@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NaverNews.Core;
 using NaverNews.Web;
 
@@ -51,6 +52,13 @@ builder.Services.AddSingleton<TwitterClient>((sp) =>
     tc.Tokens = twitterTokens;
 
     return tc;
+});
+
+builder.Services.AddLogging(b =>
+{
+    b.AddConsole();
+    b.AddDebug();
+    b.AddAzureWebAppDiagnostics();
 });
 
 var app = builder.Build();
