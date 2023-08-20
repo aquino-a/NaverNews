@@ -161,6 +161,10 @@ namespace NaverNews.Core
             {
                 _logger.LogError($"Translated summary for {article.ArticleId} is too large. [{translatedSummary.Length}]");
                 translatedSummary = Trim(translatedSummary);
+                if (translatedSummary.Length <= 0)
+                {
+                    _logger.LogError($"Translated summary couldn't be trimmed [{translatedSummary.Length}]");
+                }
             }
 
             var id = await _twitterClient.Post(translatedSummary);
@@ -232,7 +236,11 @@ namespace NaverNews.Core
                 shortenedResult.Length >= TrimLength;
                 i = translatedSummary.LastIndexOf('.', i - 1), tempLength = shortenedResult.Length)
             {
-                
+                if (i == -1)
+                {
+                    return string.Empty;
+                }
+
                 shortenedResult.Remove(i, shortenedResult.Length - i);
                 _logger.LogInformation($"Trimmed off {tempLength - shortenedResult.Length}");
             }
