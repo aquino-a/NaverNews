@@ -38,6 +38,7 @@ namespace NaverNews.Core
             var articles = _articleContext.Articles
                 .Where(a => a.Time >= lastTime)
                 .Where(a => a.ReplyCount + a.CommentCount >= EngagementMinimum)
+                .OrderByDescending(a => a.Time)
                 .ToList();
 
             if (articles == null || articles.Count == 0)
@@ -152,14 +153,21 @@ namespace NaverNews.Core
         {
             await GetArticleText(article);
             await GetSummary(article);
-            var id = await _twitterClient.Post(article.Summary);
+
+            if (article.TranslatedSummary.Length >= 280)
+            {
+                _logger.LogError($"Translated summary for {article.ArticleId} is too large. [{article.TranslatedSummary.Length}]");
+                return;
+            }
+
+            var id = await _twitterClient.Post(article.TranslatedSummary);
 
             article.WasAutoPosted = true;
             article.TwitterId = id;
             article.IsOnTwitter = true;
             await _articleContext.SaveChangesAsync();
 
-            _logger.LogInformation($"Posted article ({article.ArticleUrl}) to twitter. ({article.TwitterId}");
+            _logger.LogInformation($"Posted article ({article.ArticleUrl}) to twitter. ({article.TwitterId})");
         }
 
         private async Task<string> GetArticleText(Article article)
