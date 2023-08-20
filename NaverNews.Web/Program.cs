@@ -20,8 +20,6 @@ var engagementMinimum = builder.Configuration.GetValue<int>("Article:engagementM
 var searchPageCount = builder.Configuration.GetValue<int>("Article:searchPageCount");
 var skipThreshhold = builder.Configuration.GetValue<int>("Article:skipThreshhold");
 
-builder.Logging.AddAzureWebAppDiagnostics();
-
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddControllersWithViews();
