@@ -13,6 +13,9 @@ namespace NaverNews.Core
         private readonly string _clientSecret;
         private readonly HttpClient _httpClient;
 
+        private DateTime _expireTime;
+        private Tokens _tokens;
+
         public TwitterClient(string clientId, string clientSecret, HttpClient httpClient)
         {
             _clientId = clientId;
@@ -21,12 +24,18 @@ namespace NaverNews.Core
             _httpClient = httpClient;
         }
 
-        public Tokens Tokens { get; set; }
+        public Tokens Tokens
+        {
+            get => _tokens;
+            set
+            {
+                _tokens = value;
 
-        //scopes required
-        //tweet.read
-        //tweet.write
-        //users.read
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.Access);
+            }
+        }
+
         public async Task<string> Post(string postContent)
         {
             var json = new JsonObject();
@@ -45,6 +54,11 @@ namespace NaverNews.Core
 
         public async Task Refresh()
         {
+            if (await IsValid())
+            {
+                return;
+            }
+
             var pairs = new Dictionary<string, string>()
             {
                 { "refresh_token", Tokens.Refresh },
@@ -66,8 +80,7 @@ namespace NaverNews.Core
                 Access = root["access_token"].ToString()
             };
 
-            _httpClient.DefaultRequestHeaders.Clear();
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.Access);
+            _expireTime = DateTime.Now.AddHours(1.9);
         }
 
         private AuthenticationHeaderValue CreateBasicHeader(string clientId, string clientSecret)
@@ -75,6 +88,23 @@ namespace NaverNews.Core
             var encodedString = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{clientSecret}"));
 
             return new AuthenticationHeaderValue("Basic", encodedString);
+        }
+
+        private async Task<bool> IsAuthorized()
+        {
+            var response = await _httpClient.GetAsync(BASE_URL + "2/users/me");
+
+            return response.IsSuccessStatusCode;
+        }
+
+        private async Task<bool> IsValid()
+        {
+            if (_expireTime == default(DateTime))
+            {
+                return await IsAuthorized();
+            }
+
+            return DateTime.Now < _expireTime;
         }
     }
 }
