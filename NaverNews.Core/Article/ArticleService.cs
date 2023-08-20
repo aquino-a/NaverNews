@@ -1,13 +1,14 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Text;
+using Microsoft.Extensions.Logging;
 
 namespace NaverNews.Core
 {
     public class ArticleService : IArticleService
     {
         private readonly ArticleDbContext _articleContext;
-        private readonly ILogger<ArticleService> _logger;
         private readonly IChatGptService _chatGptService;
         private readonly NaverClient _client;
+        private readonly ILogger<ArticleService> _logger;
         private readonly TwitterClient _twitterClient;
 
         public ArticleService(NaverClient client,
@@ -23,9 +24,10 @@ namespace NaverNews.Core
             _logger = logger;
         }
 
-        public int SkipThreshhold { get; set; } = 50;
-        public int SearchPageCount { get; set; } = 20;
         public int EngagementMinimum { get; set; } = 1000;
+        public int SearchPageCount { get; set; } = 20;
+        public int SkipThreshhold { get; set; } = 50;
+        public int TrimLength { get; set; } = 280;
 
         public async Task AutoPost()
         {
@@ -154,13 +156,14 @@ namespace NaverNews.Core
             await GetArticleText(article);
             await GetSummary(article);
 
-            if (article.TranslatedSummary.Length >= 280)
+            var translatedSummary = article.TranslatedSummary;
+            if (translatedSummary.Length >= 280)
             {
-                _logger.LogError($"Translated summary for {article.ArticleId} is too large. [{article.TranslatedSummary.Length}]");
-                return;
+                _logger.LogError($"Translated summary for {article.ArticleId} is too large. [{translatedSummary.Length}]");
+                translatedSummary = Trim(translatedSummary);
             }
 
-            var id = await _twitterClient.Post(article.TranslatedSummary);
+            var id = await _twitterClient.Post(translatedSummary);
 
             article.WasAutoPosted = true;
             article.TwitterId = id;
@@ -192,7 +195,7 @@ namespace NaverNews.Core
                 .OrderByDescending(a => a.Time)
                 .FirstOrDefault();
 
-            _logger.LogInformation($"Last auto-posted article was {lastPost?.ArticleId}. ({lastPost?.ArticleUrl})");
+            _logger.LogWarning($"Last auto-posted article was {lastPost?.ArticleId}. ({lastPost?.ArticleUrl})");
 
             var lastTime = lastPost == null
                 ? default(DateTime)
@@ -219,6 +222,22 @@ namespace NaverNews.Core
             await _articleContext.SaveChangesAsync();
 
             return summary;
+        }
+
+        private string Trim(string translatedSummary)
+        {
+            var shortenedResult = new StringBuilder(translatedSummary);
+            for (
+                int i = translatedSummary.LastIndexOf('.'), tempLength = shortenedResult.Length;
+                shortenedResult.Length >= TrimLength;
+                i = translatedSummary.LastIndexOf('.', i - 1), tempLength = shortenedResult.Length)
+            {
+                
+                shortenedResult.Remove(i, shortenedResult.Length - i);
+                _logger.LogInformation($"Trimmed off {tempLength - shortenedResult.Length}");
+            }
+
+            return shortenedResult.ToString();
         }
     }
 }
