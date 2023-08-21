@@ -177,6 +177,7 @@ namespace NaverNews.Core
                 if (translatedSummary.Length <= 0)
                 {
                     _logger.LogError($"Translated summary couldn't be trimmed [{translatedSummary.Length}]");
+                    return;
                 }
             }
 
