@@ -9,3 +9,55 @@
     <input type="submit" asp-page-handler="autopost" value="Post" />
     </div>
 </form>
+<br />
+<div>
+    <form method="GET">
+        <input type="hidden" name="olderThan" value="@DateTime.UtcNow" />
+        <tr>
+            <td><input type="number" name="minimumTotal" value="500"/></td>
+            <td><input type="number" name="count" value="5"/></td>
+            <td>
+                <!-- <snippet_Edit> -->
+                @* <a asp-page="./Edit" asp-route-id="@contact.Id">Edit</a> |*@
+                <!-- </snippet_Edit> -->
+                <!-- <snippet_Delete> -->
+                <button type="submit">Refresh</button>
+                <!-- </snippet_Delete> -->
+            </td>
+        </tr>
+    </form>
+</div>
+<br />
+<div>
+    @if (Model.Articles != null)
+    {
+        foreach (var article in Model.Articles)
+        {
+            <tr>
+                <td><img src="@article.ImageUrl" /></td>
+                <td><a href="@article.ArticleUrl">@article.ArticleId</a></td>
+                <td>@article.Title</td>
+                <td>@article.Time</td>
+                <td>
+                    <!-- <snippet_Edit> -->
+                   @* <a asp-page="./Edit" asp-route-id="@contact.Id">Edit</a> |*@
+                    <!-- </snippet_Edit> -->
+                    <form method="POST">
+                        <button type="submit" asp-route-id="@article.ArticleId">Post</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    }
+</div>
+<div>
+    @if(Model.Articles != null && Model.Articles.Count() > 0)
+    {
+        <form method="GET">
+            <input type="hidden" name="olderThan" value="@Model.Articles.Last().Time" />
+            <input type="hidden" name="minimumTotal" value="500" />
+            <input type="hidden" name="count" value="5" />
+            <button type="submit">></button>
+        </form>
+    }
+</div>

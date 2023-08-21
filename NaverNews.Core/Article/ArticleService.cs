@@ -87,7 +87,7 @@ namespace NaverNews.Core
             return _articleContext.Articles
                 .OrderByDescending(a => a.Time)
                 .Where(a => a.Time <= olderThan)
-                .Where(a => a.Total >= minimumTotal)
+                .Where(a => a.ReplyCount + a.CommentCount >= minimumTotal)
                 .Take(count);
         }
 
