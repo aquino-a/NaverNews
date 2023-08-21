@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Moq;
 
 namespace NaverNews.Core.Tests
 {
@@ -11,7 +13,11 @@ namespace NaverNews.Core.Tests
         public async Task RefreshTest()
         {
             var httpClient = new HttpClient();
-            var tc = new TwitterClient(_configuration["Twitter:clientId"]!, _configuration["Twitter:clientSecret"]!, httpClient);
+            var logger = new Mock<ILogger<TwitterClient>>();
+            var tc = new TwitterClient(_configuration["Twitter:clientId"]!,
+                                       _configuration["Twitter:clientSecret"]!,
+                                       httpClient,
+                                       logger.Object);
             tc.Tokens = new Tokens
             {
                 Access = _configuration["Twitter:accessToken"]!,
