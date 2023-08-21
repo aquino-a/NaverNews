@@ -43,7 +43,7 @@
                    @* <a asp-page="./Edit" asp-route-id="@contact.Id">Edit</a> |*@
                     <!-- </snippet_Edit> -->
                     <form method="POST">
-                        <button type="submit" asp-route-id="@article.ArticleId">Post</button>
+                        <button type="submit" asp-route-id="@article.ArticleId" asp-page-handler="autopost">Post</button>
                     </form>
                 </td>
             </tr>
