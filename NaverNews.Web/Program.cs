@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using NaverNews.Core;
 using NaverNews.Web;
 
@@ -29,10 +28,11 @@ builder.Services.AddRazorPages();
 
 if (!builder.Environment.IsDevelopment())
 {
-    builder.Services.AddHostedService<SearchAutoPostService>();
+    builder.Services.AddHostedService<ConsumeScopedServiceHostedService<SearchAutoPostService>>();
+    builder.Services.AddScoped<SearchAutoPostService>();
 }
 
-builder.Services.AddSingleton<IArticleService, ArticleService>(sp =>
+builder.Services.AddScoped<IArticleService, ArticleService>(sp =>
 {
     var articleService = new ArticleService(
         sp.GetRequiredService<NaverClient>(),
@@ -48,11 +48,11 @@ builder.Services.AddSingleton<IArticleService, ArticleService>(sp =>
     return articleService;
 });
 
-builder.Services.AddDbContext<ArticleDbContext>(options => options.UseCosmos(connectionString, "news"), ServiceLifetime.Singleton);
+builder.Services.AddDbContext<ArticleDbContext>(options => options.UseCosmos(connectionString, "news"), ServiceLifetime.Scoped);
 builder.Services.AddTransient<HttpClient>();
-builder.Services.AddSingleton<NaverClient>();
-builder.Services.AddSingleton<IChatGptService, ChatGptService>(sp => new ChatGptService(sp.GetRequiredService<HttpClient>(), chatGptApiKey));
-builder.Services.AddSingleton<TwitterClient>((sp) =>
+builder.Services.AddScoped<NaverClient>();
+builder.Services.AddScoped<IChatGptService, ChatGptService>(sp => new ChatGptService(sp.GetRequiredService<HttpClient>(), chatGptApiKey));
+builder.Services.AddScoped<TwitterClient>((sp) =>
 {
     var tc = new TwitterClient(twitterClientId,
                                twitterClientSecret,
@@ -65,8 +65,11 @@ builder.Services.AddSingleton<TwitterClient>((sp) =>
 
 var app = builder.Build();
 
-var articleContext = app.Services.GetRequiredService<ArticleDbContext>();
-await articleContext.Database.EnsureCreatedAsync();
+using (var scope = app.Services.CreateScope())
+{
+    var articleContext = scope.ServiceProvider.GetRequiredService<ArticleDbContext>();
+    await articleContext.Database.EnsureCreatedAsync();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
