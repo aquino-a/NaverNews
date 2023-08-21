@@ -39,6 +39,7 @@ namespace NaverNews.Core
 
             var articles = _articleContext.Articles
                 .Where(a => a.Time >= lastTime)
+                .Where(a => !a.WasAutoPosted)
                 .Where(a => a.ReplyCount + a.CommentCount >= EngagementMinimum)
                 .OrderByDescending(a => a.Time)
                 .ToList();
