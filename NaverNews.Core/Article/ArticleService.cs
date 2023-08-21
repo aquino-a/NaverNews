@@ -1,5 +1,5 @@
-﻿using System.Text;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
+using System.Text;
 
 namespace NaverNews.Core
 {
@@ -57,6 +57,18 @@ namespace NaverNews.Core
             {
                 await AutoPost(article);
             }
+        }
+
+        public async Task AutoPost(string articleId)
+        {
+            var existingArticle = _articleContext.Find<Article>(articleId);
+
+            if (existingArticle == null)
+            {
+                throw new ArticleNotFoundException();
+            }
+
+            await AutoPost(existingArticle);
         }
 
         public async Task<string> GetArticleText(string articleId)

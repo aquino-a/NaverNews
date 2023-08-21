@@ -1,0 +1,11 @@
+﻿@page
+@model NaverNews.Web.Pages.ArticlesModel
+@{
+}
+
+<form method="POST">
+    <div>
+        Article Id: <input name="id" />
+    <input type="submit" asp-page-handler="autopost" value="Post" />
+    </div>
+</form>

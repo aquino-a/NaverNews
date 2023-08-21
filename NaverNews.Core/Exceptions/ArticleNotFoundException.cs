@@ -3,7 +3,7 @@
 namespace NaverNews.Core
 {
     [Serializable]
-    internal class ArticleNotFoundException : Exception
+    public class ArticleNotFoundException : Exception
     {
         public ArticleNotFoundException()
         {
