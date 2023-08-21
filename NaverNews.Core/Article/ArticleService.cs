@@ -177,6 +177,10 @@ namespace NaverNews.Core
                 if (translatedSummary.Length <= 0)
                 {
                     _logger.LogError($"Translated summary couldn't be trimmed [{translatedSummary.Length}]");
+                    article.WasAutoPosted = true;
+                    article.TwitterId = "trim fail";
+                    await _articleContext.SaveChangesAsync();
+
                     return;
                 }
             }
