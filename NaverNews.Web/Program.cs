@@ -27,7 +27,11 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-builder.Services.AddHostedService<SearchAutoPostService>();
+if (!builder.Environment.IsDevelopment())
+{
+    builder.Services.AddHostedService<SearchAutoPostService>();
+}
+
 builder.Services.AddSingleton<IArticleService, ArticleService>(sp =>
 {
     var articleService = new ArticleService(
