@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Text;
+using System.Web;
 
 namespace NaverNews.Core
 {
@@ -68,7 +69,9 @@ namespace NaverNews.Core
                 throw new ArticleNotFoundException();
             }
 
-            await AutoPost(existingArticle);
+            // used only from controller where one is posted.
+			await _twitterClient.Refresh();
+			await AutoPost(existingArticle);
         }
 
         public async Task<string> GetArticleText(string articleId)
@@ -204,7 +207,7 @@ namespace NaverNews.Core
 
             var text = await _client.GetArticleText(article);
 
-            article.Text = text;
+            article.Text = HttpUtility.HtmlDecode(text);
             await _articleContext.SaveChangesAsync();
 
             return text;
