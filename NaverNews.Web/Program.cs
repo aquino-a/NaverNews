@@ -49,7 +49,7 @@ builder.Services.AddScoped<IArticleService, ArticleService>(sp =>
 });
 
 builder.Services.AddDbContext<ArticleDbContext>(options => options.UseCosmos(connectionString, "news"), ServiceLifetime.Scoped);
-builder.Services.AddDbContext<TokenDbContext>(options => options.UseCosmos(connectionString, "news"), ServiceLifetime.Scoped);
+builder.Services.AddDbContext<TokenDbContext>(options => options.UseCosmos(connectionString, "news"), ServiceLifetime.Transient, ServiceLifetime.Transient);
 builder.Services.AddTransient<HttpClient>();
 builder.Services.AddScoped<NaverClient>();
 builder.Services.AddScoped<IChatGptService, ChatGptService>(sp => new ChatGptService(sp.GetRequiredService<HttpClient>(), chatGptApiKey));

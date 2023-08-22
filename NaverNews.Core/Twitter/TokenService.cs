@@ -42,7 +42,7 @@ namespace NaverNews.Core
 
         public async Task Load()
         {
-            Tokens = await _tokenContext.Tokens.FirstAsync();
+            Tokens = await _tokenContext.Tokens.FindAsync("naver-news");
         }
 
         public async Task Refresh()
