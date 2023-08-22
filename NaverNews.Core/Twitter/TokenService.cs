@@ -8,6 +8,7 @@ namespace NaverNews.Core
 {
     public class TokenService
     {
+        private readonly AuthenticationHeaderValue _basicAuth;
         private readonly HttpClient _httpClient;
         private readonly ILogger<TokenService> _logger;
         private readonly object _refreshLock = new object();
@@ -21,7 +22,7 @@ namespace NaverNews.Core
         {
             _tokenContext = tokenContext;
             _httpClient = httpClient;
-            _httpClient.DefaultRequestHeaders.Authorization = CreateBasicHeader(clientId, clientSecret);
+            _basicAuth = CreateBasicHeader(clientId, clientSecret);
             _logger = logger;
         }
 
@@ -43,6 +44,7 @@ namespace NaverNews.Core
         public async Task Load()
         {
             Tokens = await _tokenContext.Tokens.FindAsync("naver-news");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Tokens.Access);
         }
 
         public async Task Refresh()
@@ -55,6 +57,7 @@ namespace NaverNews.Core
 
             _logger.LogInformation("Token is not valid. Starting refresh.");
 
+            _httpClient.DefaultRequestHeaders.Authorization = _basicAuth;
             var content = GetRefreshContent();
             var response = await _httpClient.PostAsync(TwitterClient.BASE_URL + "2/oauth2/token", content);
 
@@ -76,6 +79,8 @@ namespace NaverNews.Core
             tokens.ExpireTime = DateTime.UtcNow.AddHours(2);
 
             await _tokenContext.SaveChangesAsync();
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", tokens.Access);
         }
 
         private AuthenticationHeaderValue CreateBasicHeader(string clientId, string clientSecret)
