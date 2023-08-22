@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web;
 
 namespace NaverNews.Core
@@ -11,6 +12,7 @@ namespace NaverNews.Core
         private readonly NaverClient _client;
         private readonly ILogger<ArticleService> _logger;
         private readonly TwitterClient _twitterClient;
+        private readonly Regex KOREAN_REGEX = new Regex("[\uAC00-\uD7AF]{4,}", RegexOptions.Compiled);
 
         public ArticleService(NaverClient client,
                               IChatGptService chatGptService,
@@ -70,8 +72,8 @@ namespace NaverNews.Core
             }
 
             // used only from controller where one is posted.
-			await _twitterClient.Refresh();
-			await AutoPost(existingArticle);
+            await _twitterClient.Refresh();
+            await AutoPost(existingArticle);
         }
 
         public async Task<string> GetArticleText(string articleId)
@@ -186,6 +188,12 @@ namespace NaverNews.Core
 
                     return;
                 }
+            }
+
+            if (KOREAN_REGEX.IsMatch(translatedSummary))
+            {
+                _logger.LogError($"Translated summary had too much Korean. Skipped.");
+                return;
             }
 
             var id = await _twitterClient.Post(translatedSummary);
