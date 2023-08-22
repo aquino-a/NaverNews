@@ -1,7 +1,5 @@
-using Castle.Core.Resource;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using NaverNews.Core;
 
 namespace NaverNews.Web.Pages
@@ -16,6 +14,9 @@ namespace NaverNews.Web.Pages
         }
 
         public IEnumerable<Article> Articles { get; private set; }
+        public int Count { get; private set; }
+        public int MinimumTotal { get; private set; }
+        public DateTime OlderThan { get; private set; }
 
         public void OnGet([FromQuery] DateTime olderThan,
                           [FromQuery] int minimumTotal = 500,
@@ -27,6 +28,10 @@ namespace NaverNews.Web.Pages
             }
 
             Articles = _articleService.GetByTimeAndTotal(olderThan, minimumTotal, count).ToArray();
+
+            Count = count;
+            MinimumTotal = minimumTotal;
+            OlderThan = olderThan;
         }
 
         public async Task<IActionResult> OnPostAutoPostAsync(string id)

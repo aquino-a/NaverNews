@@ -12,10 +12,10 @@
 <br />
 <div>
     <form method="GET">
-        <input type="hidden" name="olderThan" value="@DateTime.UtcNow" />
+        <input type="hidden" name="olderThan" value="@Model.OlderThan" />
         <tr>
-            <td><input type="number" name="minimumTotal" value="500"/></td>
-            <td><input type="number" name="count" value="5"/></td>
+            <td><input type="number" name="minimumTotal" value="@Model.MinimumTotal"/></td>
+            <td><input type="number" name="count" value="@Model.Count"/></td>
             <td>
                 <!-- <snippet_Edit> -->
                 @* <a asp-page="./Edit" asp-route-id="@contact.Id">Edit</a> |*@
@@ -50,13 +50,14 @@
         }
     }
 </div>
+<br/>
 <div>
     @if(Model.Articles != null && Model.Articles.Count() > 0)
     {
         <form method="GET">
             <input type="hidden" name="olderThan" value="@Model.Articles.Last().Time" />
-            <input type="hidden" name="minimumTotal" value="500" />
-            <input type="hidden" name="count" value="5" />
+            <input type="hidden" name="minimumTotal" value="@Model.MinimumTotal" />
+            <input type="hidden" name="count" value="@Model.Count" />
             <button type="submit">></button>
         </form>
     }
