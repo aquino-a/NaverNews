@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using NaverNews.Core.Twitter;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json.Nodes;
@@ -12,11 +11,11 @@ namespace NaverNews.Core
         private readonly HttpClient _httpClient;
         private readonly ILogger<TokenService> _logger;
         private readonly object _refreshLock = new object();
-        private readonly TokenContext _tokenContext;
+        private readonly TokenDbContext _tokenContext;
 
         public TokenService(string clientId,
                             string clientSecret,
-                            TokenContext tokenContext,
+                            TokenDbContext tokenContext,
                             HttpClient httpClient,
                             ILogger<TokenService> logger)
         {

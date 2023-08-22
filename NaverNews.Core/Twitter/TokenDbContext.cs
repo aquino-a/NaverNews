@@ -5,11 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NaverNews.Core.Twitter
+namespace NaverNews.Core
 {
-    public class TokenContext : DbContext
+    public class TokenDbContext : DbContext
     {
-        public TokenContext(DbContextOptions options) : base(options)
+        public TokenDbContext(DbContextOptions options) : base(options)
         {
         }
 
