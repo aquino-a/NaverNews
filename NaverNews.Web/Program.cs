@@ -49,17 +49,26 @@ builder.Services.AddScoped<IArticleService, ArticleService>(sp =>
 });
 
 builder.Services.AddDbContext<ArticleDbContext>(options => options.UseCosmos(connectionString, "news"), ServiceLifetime.Scoped);
+builder.Services.AddDbContext<TokenDbContext>(options => options.UseCosmos(connectionString, "news"), ServiceLifetime.Scoped);
 builder.Services.AddTransient<HttpClient>();
 builder.Services.AddScoped<NaverClient>();
 builder.Services.AddScoped<IChatGptService, ChatGptService>(sp => new ChatGptService(sp.GetRequiredService<HttpClient>(), chatGptApiKey));
+builder.Services.AddSingleton<TokenService>(sp =>
+{
+    var tokenService = new TokenService(twitterClientId,
+                                        twitterClientSecret,
+                                        sp.GetRequiredService<TokenDbContext>(),
+                                        sp.GetRequiredService<HttpClient>(),
+                                        sp.GetRequiredService<ILogger<TokenService>>());
+    tokenService.Load().GetAwaiter().GetResult();
+
+    return tokenService;
+});
 builder.Services.AddScoped<TwitterClient>((sp) =>
 {
-    var tc = new TwitterClient(twitterClientId,
-                               twitterClientSecret,
+    var tc = new TwitterClient(sp.GetRequiredService<TokenService>(),
                                sp.GetRequiredService<HttpClient>(),
                                sp.GetRequiredService<ILogger<TwitterClient>>());
-    tc.Tokens = twitterTokens;
-
     return tc;
 });
 
@@ -69,6 +78,9 @@ using (var scope = app.Services.CreateScope())
 {
     var articleContext = scope.ServiceProvider.GetRequiredService<ArticleDbContext>();
     await articleContext.Database.EnsureCreatedAsync();
+
+    var tokenContext = scope.ServiceProvider.GetRequiredService<TokenDbContext>();
+    await tokenContext.Database.EnsureCreatedAsync();
 }
 
 // Configure the HTTP request pipeline.

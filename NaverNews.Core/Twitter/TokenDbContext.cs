@@ -9,7 +9,7 @@ namespace NaverNews.Core
 {
     public class TokenDbContext : DbContext
     {
-        public TokenDbContext(DbContextOptions options) : base(options)
+        public TokenDbContext(DbContextOptions<TokenDbContext> options) : base(options)
         {
         }
 

@@ -1,5 +1,8 @@
-﻿namespace NaverNews.Core
+﻿using Microsoft.EntityFrameworkCore;
+
+namespace NaverNews.Core
 {
+    [Keyless]
     public class Tokens
     {
         public string Refresh { get; set; }
