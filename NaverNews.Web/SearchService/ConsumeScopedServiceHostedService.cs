@@ -1,7 +1,7 @@
 ﻿namespace NaverNews.Web
 {
     internal class ConsumeScopedServiceHostedService<T> : BackgroundService
-        where T : BackgroundService
+        where T : TimedService
     {
         private readonly ILogger<ConsumeScopedServiceHostedService<T>> _logger;
 
@@ -27,21 +27,13 @@
             _logger.LogInformation(
                 "Consume Scoped Service Hosted Service running.");
 
-            await DoWork(stoppingToken);
-        }
-
-        private async Task DoWork(CancellationToken stoppingToken)
-        {
-            _logger.LogInformation(
-                "Consume Scoped Service Hosted Service is working.");
-
             using (var scope = Services.CreateScope())
             {
                 var scopedProcessingService =
                     scope.ServiceProvider
                         .GetRequiredService<T>();
 
-                await scopedProcessingService.StartAsync(stoppingToken);
+                await scopedProcessingService.ExecuteAsync(stoppingToken);
             }
         }
     }

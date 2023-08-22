@@ -1,26 +1,18 @@
 ﻿namespace NaverNews.Web
 {
-    internal abstract class TimedHostedService : BackgroundService
+    internal abstract class TimedService
     {
-        protected readonly ILogger<TimedHostedService> _logger;
+        protected readonly ILogger<TimedService> _logger;
         private readonly TimeSpan _frequency;
         private int _executionCount;
 
-        public TimedHostedService(TimeSpan frequency, ILogger<TimedHostedService> logger)
+        public TimedService(TimeSpan frequency, ILogger<TimedService> logger)
         {
             _frequency = frequency;
             _logger = logger;
         }
 
-        // Could also be a async method, that can be awaited in ExecuteAsync above
-        protected virtual async Task DoWork()
-        {
-            int count = Interlocked.Increment(ref _executionCount);
-
-            _logger.LogInformation("Timed Hosted Service is working. Count: {Count}", count);
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+        public async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             _logger.LogInformation("Timed Hosted Service running.");
 
@@ -41,5 +33,7 @@
                 _logger.LogInformation("Timed Hosted Service is stopping.");
             }
         }
+
+        protected abstract Task DoWork();
     }
 }
