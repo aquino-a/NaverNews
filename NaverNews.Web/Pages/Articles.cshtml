@@ -36,14 +36,17 @@
 				<td><img src="@article.ImageUrl" /></td>
 				<td><a href="@article.ArticleUrl" target="_blank" rel="noopener noreferrer">@article.ArticleId</a></td>
 				<td>@article.Title</td>
-				<td>@article.Time</td>
+				<td>@article.Time.ToLocalTime()</td>
 				<td>
 					<!-- <snippet_Edit> -->
 					@* <a asp-page="./Edit" asp-route-id="@contact.Id">Edit</a> |*@
 					<!-- </snippet_Edit> -->
-					<form method="POST">
-						<button type="submit" asp-route-id="@article.ArticleId" asp-page-handler="autopost">Post</button>
-					</form>
+					if (@article.TwitterId != null)
+					{
+						<form method="POST">
+							<button type="submit" asp-route-id="@article.ArticleId" asp-page-handler="autopost">Post</button>
+						</form>
+					}
 				</td>
 			</tr>
 		}
