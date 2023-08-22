@@ -7,7 +7,7 @@ namespace NaverNews.Core
     public class ChatGptService : IChatGptService
     {
         private const string COMPLETION_URL = "https://api.openai.com/v1/chat/completions";
-        private const string SUMMARIZE_SYSTEM = "use headlinese to concisely shorten the article to less than 35 words with short sentences.";
+        private const string SUMMARIZE_SYSTEM = "use headlinese to concisely shorten the article to less than 35 words with short English sentences.";
 
         private readonly HttpClient _httpClient;
 
