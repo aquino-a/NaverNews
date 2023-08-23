@@ -141,6 +141,8 @@ namespace NaverNews.Core
         public async Task<int> SearchArticles(NewsType type, int pages)
         {
             var searchResult = new SearchResult { StartTime = DateTime.UtcNow };
+            _articleContext.SearchResults.Add(searchResult);
+            await _articleContext.SaveChangesAsync();
 
             var articles = await _client.GetArticles(type, pages);
             articles = articles.Where(a => a.Total >= SkipThreshhold).ToList();
@@ -163,7 +165,6 @@ namespace NaverNews.Core
             searchResult.Count = changeCount;
             searchResult.EndTime = DateTime.UtcNow;
 
-            _articleContext.SearchResults.Add(searchResult);
             await _articleContext.SaveChangesAsync();
 
             return changeCount;
