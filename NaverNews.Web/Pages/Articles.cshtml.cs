@@ -32,6 +32,10 @@ namespace NaverNews.Web.Pages
             Count = count;
             MinimumTotal = minimumTotal;
             OlderThan = olderThan;
+
+            Response.Cookies.Append(nameof(Count), Count.ToString());
+            Response.Cookies.Append(nameof(MinimumTotal), MinimumTotal.ToString());
+            Response.Cookies.Append(nameof(OlderThan), OlderThan.ToString());
         }
 
         public async Task<IActionResult> OnPostAutoPostAsync(string id)
@@ -40,7 +44,11 @@ namespace NaverNews.Web.Pages
             {
                 await _articleService.AutoPost(id);
 
-                return RedirectToPage();
+                var count = Convert.ToInt16(Request.Cookies[nameof(Count)]);
+                var minimumTotal = Convert.ToInt16(Request.Cookies[nameof(MinimumTotal)]);
+                var olderThan = Convert.ToDateTime(Request.Cookies[nameof(OlderThan)]);
+
+                return RedirectToPage(new { Count = count, MinimumTotal = minimumTotal, OlderThan = olderThan });
             }
             catch (ArticleNotFoundException e)
             {
