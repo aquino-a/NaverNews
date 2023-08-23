@@ -41,14 +41,20 @@
 					<!-- <snippet_Edit> -->
 					@* <a asp-page="./Edit" asp-route-id="@contact.Id">Edit</a> |*@
 					<!-- </snippet_Edit> -->
-					if (@article.TwitterId != null)
+					@if (string.IsNullOrWhiteSpace(article.TwitterId))
 					{
 						<form method="POST">
 							<button type="submit" asp-route-id="@article.ArticleId" asp-page-handler="autopost">Post</button>
 						</form>
 					}
+					else {
+						<br/>
+						<a href="https://twitter.com/korean_pulse/status/@article.TwitterId">Twitter Post</a>
+						<br/>
+					}
 				</td>
 			</tr>
+			<br/>
 		}
 	}
 </div>
