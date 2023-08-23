@@ -11,6 +11,11 @@ namespace NaverNews.Function
     {
         private readonly IArticleService _articleService;
 
+        public AutoPostTimer(IArticleService articleService)
+        {
+            _articleService = articleService;
+        }
+
         [FunctionName("AutoPostTimer")]
         public async Task Run([TimerTrigger("0 */1 * * * *")] TimerInfo myTimer, ILogger logger)
         {
