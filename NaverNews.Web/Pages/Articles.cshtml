@@ -26,37 +26,51 @@
 		</tr>
 	</form>
 </div>
-<br />
 <div>
-	@if (Model.Articles != null)
-	{
-		foreach (var article in Model.Articles)
-		{
+	<table class="table table-dark table-striped">
+		<thead>
 			<tr>
-				<td><img src="@article.ImageUrl" /></td>
-				<td><a href="@article.ArticleUrl" target="_blank" rel="noopener noreferrer">@article.ArticleId</a></td>
-				<td>@article.Title</td>
-				<td>@article.Time.ToLocalTime()</td>
-				<td>
-					<!-- <snippet_Edit> -->
-					@* <a asp-page="./Edit" asp-route-id="@contact.Id">Edit</a> |*@
-					<!-- </snippet_Edit> -->
-					@if (string.IsNullOrWhiteSpace(article.TwitterId))
-					{
-						<form method="POST">
-							<input type="submit" asp-route-id="@article.ArticleId" asp-page-handler="autopost" value="Post" />
-						</form>
-					}
-					else {
-						<br/>
-						<a href="https://twitter.com/korean_pulse/status/@article.TwitterId">Twitter Post</a>
-						<br/>
-					}
-				</td>
+				<th></th>
+				<th></th>
+				<th></th>
+				<th></th>
+				<th>Reacts</th>
+				<th>Comments</th>
+				<th></th>
 			</tr>
-			<br/>
+		</thead>
+		@if (Model.Articles != null)
+		{
+			foreach (var article in Model.Articles)
+			{
+				<tr>
+					<td><img src="@article.ImageUrl" /></td>
+					<td><a href="@article.ArticleUrl" target="_blank" rel="noopener noreferrer">@article.ArticleId</a></td>
+					<td>@article.Title</td>
+					<td>@article.Time.ToLocalTime()</td>
+					<td>@article.ReplyCount</td>
+					<td>@article.CommentCount</td>
+					<td>
+						<!-- <snippet_Edit> -->
+						@* <a asp-page="./Edit" asp-route-id="@contact.Id">Edit</a> |*@
+						<!-- </snippet_Edit> -->
+						@if (string.IsNullOrWhiteSpace(article.TwitterId))
+						{
+							<form method="POST">
+								<input type="submit" asp-route-id="@article.ArticleId" asp-page-handler="autopost" value="Post" />
+							</form>
+						}
+						else {
+							<br/>
+							<a href="https://twitter.com/korean_pulse/status/@article.TwitterId">Twitter Post</a>
+							<br/>
+						}
+					</td>
+				</tr>
+				<br/>
+			}
 		}
-	}
+	</table>
 </div>
 <br />
 <div>
