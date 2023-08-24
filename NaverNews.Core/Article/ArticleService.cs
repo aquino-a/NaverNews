@@ -31,6 +31,7 @@ namespace NaverNews.Core
         public int SearchPageCount { get; set; } = 20;
         public int SkipThreshhold { get; set; } = 50;
         public int TrimLength { get; set; } = 280;
+        public int UrlLength { get; set; } = 23;
 
         public async Task AutoPost()
         {
@@ -170,6 +171,16 @@ namespace NaverNews.Core
             return changeCount;
         }
 
+        private string AddUrl(string translatedSummary, string articleUrl)
+        {
+            if (translatedSummary.Length <= TrimLength - UrlLength)
+            {
+                return translatedSummary + articleUrl;
+            }
+
+            return translatedSummary;
+        }
+
         private async Task AutoPost(Article article)
         {
             await GetArticleText(article);
@@ -196,6 +207,8 @@ namespace NaverNews.Core
                 _logger.LogError($"Translated summary had too much Korean. Skipped.");
                 return;
             }
+
+            translatedSummary = AddUrl(translatedSummary, article.ArticleUrl);
 
             var id = await _twitterClient.Post(translatedSummary);
 
