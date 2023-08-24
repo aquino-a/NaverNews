@@ -1,0 +1,37 @@
+﻿@page
+@model NaverNews.Web.Pages.SearchModel
+@{
+}
+
+<div>
+	<form method="POST">
+		<button type="submit">Start Search</button>
+	</form>
+</div>
+<br/>
+<div>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Start</th>
+				<th>End</th>
+				<th>#</th>
+			</tr>
+		</thead>
+		@if (Model.SearchResults != null)
+		{
+			foreach (var searchResult in Model.SearchResults)
+			{
+				<tr>
+					<td>@searchResult.StartTime.ToLocalTime()</td>
+					<td>@if (searchResult.EndTime != default(DateTime))
+						{
+							@searchResult.EndTime.ToLocalTime()
+						}
+					</td>
+					<td>@searchResult.Count</td>
+				</tr>
+			}
+		}
+	</table>
+</div>

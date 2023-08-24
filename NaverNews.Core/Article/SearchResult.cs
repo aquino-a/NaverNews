@@ -1,12 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace NaverNews.Core
 {
+    [Index(nameof(EndTime))]
     public class SearchResult
     {
-        [Key]
-        public DateTime EndTime { get; set; }
-        public DateTime StartTime { get; set; }
         public int Count { get; set; }
+        public DateTime EndTime { get; set; }
+
+        [Key]
+        public DateTime StartTime { get; set; }
     }
 }
