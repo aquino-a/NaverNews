@@ -20,7 +20,7 @@
 				@* <a asp-page="./Edit" asp-route-id="@contact.Id">Edit</a> |*@
 				<!-- </snippet_Edit> -->
 				<!-- <snippet_Delete> -->
-				<button type="submit">Refresh</button>
+				<input type="submit" value="Refresh" />
 				<!-- </snippet_Delete> -->
 			</td>
 		</tr>
@@ -44,7 +44,7 @@
 					@if (string.IsNullOrWhiteSpace(article.TwitterId))
 					{
 						<form method="POST">
-							<button type="submit" asp-route-id="@article.ArticleId" asp-page-handler="autopost">Post</button>
+							<input type="submit" asp-route-id="@article.ArticleId" asp-page-handler="autopost" value="Post" />
 						</form>
 					}
 					else {
@@ -66,7 +66,7 @@
 			<input type="hidden" name="olderThan" value="@Model.Articles.Last().Time" />
 			<input type="hidden" name="minimumTotal" value="@Model.MinimumTotal" />
 			<input type="hidden" name="count" value="@Model.Count" />
-			<button type="submit">></button>
+			<input type="submit" value="Next >>"/>
 		</form>
 	}
 </div>
