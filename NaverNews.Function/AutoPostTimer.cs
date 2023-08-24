@@ -6,27 +6,27 @@ using NaverNews.Core;
 
 namespace NaverNews.Function
 {
-	public class AutoPostTimer
-	{
-		private readonly IArticleService _articleService;
+    public class AutoPostTimer
+    {
+        private readonly IArticleService _articleService;
 
-		public AutoPostTimer(IArticleService articleService)
-		{
-			_articleService = articleService;
-		}
+        public AutoPostTimer(IArticleService articleService)
+        {
+            _articleService = articleService;
+        }
 
-		[Function("AutoPostTimer")]
-		public async Task Run([TimerTrigger("0 */1 * * * *")] ILogger logger)
-		{
-			logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
-			try
-			{
-				await _articleService.AutoPost();
-			}
-			catch (Exception e)
-			{
-				logger.LogError(e, "Problem autoposting articles.");
-			}
-		}
-	}
+        [Function("AutoPostTimer")]
+        public async Task Run([TimerTrigger("0 0 * * * *")] ILogger logger)
+        {
+            logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
+            try
+            {
+                await _articleService.AutoPost();
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Problem autoposting articles.");
+            }
+        }
+    }
 }

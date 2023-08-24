@@ -2,7 +2,7 @@ name: Build and deploy .NET Core application to Function App NaverNewsFunction20
 on:
   push:
     branches:
-    - release
+    - f-release
 env:
   AZURE_FUNCTIONAPP_NAME: NaverNewsFunction20230823100648
   AZURE_FUNCTIONAPP_PACKAGE_PATH: NaverNews.Function\published
