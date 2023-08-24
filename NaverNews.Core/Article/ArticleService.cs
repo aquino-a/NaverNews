@@ -31,7 +31,7 @@ namespace NaverNews.Core
         public int SearchPageCount { get; set; } = 20;
         public int SkipThreshhold { get; set; } = 50;
         public int TrimLength { get; set; } = 280;
-        public int UrlLength { get; set; } = 23;
+        public int UrlLength { get; set; } = 24;
 
         public async Task AutoPost()
         {
@@ -175,7 +175,7 @@ namespace NaverNews.Core
         {
             if (translatedSummary.Length <= TrimLength - UrlLength)
             {
-                return translatedSummary + articleUrl;
+                return $"{translatedSummary} {articleUrl}";
             }
 
             return translatedSummary;
