@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using NaverNews.Core;
@@ -9,23 +7,25 @@ namespace NaverNews.Function
     public class AutoPostTimer
     {
         private readonly IArticleService _articleService;
+        private readonly ILogger _logger;
 
-        public AutoPostTimer(IArticleService articleService)
+        public AutoPostTimer(IArticleService articleService, ILogger<AutoPostTimer> logger)
         {
             _articleService = articleService;
+            _logger = logger;
         }
 
         [Function("AutoPostTimer")]
-        public async Task Run([TimerTrigger("0 0 * * * *")] ILogger logger)
+        public async Task Run([TimerTrigger("0 0 * * * *")] TimerInfo timerInfo)
         {
-            logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
+            _logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
             try
             {
                 await _articleService.AutoPost();
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Problem autoposting articles.");
+                _logger.LogError(e, "Problem autoposting articles.");
             }
         }
     }
