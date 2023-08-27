@@ -36,14 +36,11 @@ namespace NaverNews.Core
         public async Task AutoPost()
         {
             _logger.LogInformation($"Starting auto post for {NewsType.Society}");
-            var count = await SearchArticles(NewsType.Society, SearchPageCount);
-            _logger.LogInformation($"Found {count} new articles.");
+            var articles = await SearchArticles(NewsType.Society, SearchPageCount);
+            _logger.LogInformation($"Found {articles.Count} new articles.");
 
-            var lastTime = GetLastAutoPostTime();
-
-            var articles = _articleContext.Articles
-                .Where(a => a.Time >= lastTime)
-                .Where(a => !a.WasAutoPosted)
+            articles = articles
+                .Where(a => string.IsNullOrWhiteSpace(a.TwitterId))
                 .Where(a => a.ReplyCount + a.CommentCount >= EngagementMinimum)
                 .OrderByDescending(a => a.Time)
                 .ToList();
@@ -139,7 +136,7 @@ namespace NaverNews.Core
             return id;
         }
 
-        public async Task<int> SearchArticles(NewsType type, int pages)
+        public async Task<List<Article>> SearchArticles(NewsType type, int pages)
         {
             var searchResult = new SearchResult { StartTime = DateTime.UtcNow };
             _articleContext.SearchResults.Add(searchResult);
@@ -168,7 +165,7 @@ namespace NaverNews.Core
 
             await _articleContext.SaveChangesAsync();
 
-            return changeCount;
+            return articles;
         }
 
         private string AddUrl(string translatedSummary, string articleUrl)
