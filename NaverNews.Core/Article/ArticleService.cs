@@ -184,7 +184,7 @@ namespace NaverNews.Core
             await GetSummary(article);
 
             var translatedSummary = article.TranslatedSummary;
-            if (translatedSummary.Length >= 280)
+            if (translatedSummary.Length >= TrimLength)
             {
                 _logger.LogError($"Translated summary for {article.ArticleId} is too large. [{translatedSummary.Length}]");
                 translatedSummary = Trim(translatedSummary);

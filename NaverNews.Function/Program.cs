@@ -15,6 +15,7 @@ var twitterClientSecret = Environment.GetEnvironmentVariable("Twitter:clientSecr
 var engagementMinimum = Convert.ToInt32(Environment.GetEnvironmentVariable("Article:engagementMinimum"));
 var searchPageCount = Convert.ToInt32(Environment.GetEnvironmentVariable("Article:searchPageCount"));
 var skipThreshhold = Convert.ToInt32(Environment.GetEnvironmentVariable("Article:skipThreshhold"));
+var trimLength = Convert.ToInt32(Environment.GetEnvironmentVariable("Article:trimLength"));
 
 var builder = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
@@ -32,6 +33,7 @@ var builder = new HostBuilder()
             articleService.EngagementMinimum = engagementMinimum;
             articleService.SearchPageCount = searchPageCount;
             articleService.SkipThreshhold = skipThreshhold;
+            articleService.TrimLength = trimLength;
 
             return articleService;
         });

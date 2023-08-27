@@ -18,6 +18,7 @@ var twitterTokens = new Tokens
 var engagementMinimum = builder.Configuration.GetValue<int>("Article:engagementMinimum");
 var searchPageCount = builder.Configuration.GetValue<int>("Article:searchPageCount");
 var skipThreshhold = builder.Configuration.GetValue<int>("Article:skipThreshhold");
+var trimLength = builder.Configuration.GetValue<int>("Article:trimLength");
 
 builder.Logging.AddAzureWebAppDiagnostics().AddFilter("Microsoft", LogLevel.Error);
 
@@ -38,6 +39,7 @@ builder.Services.AddScoped<IArticleService, ArticleService>(sp =>
     articleService.EngagementMinimum = engagementMinimum;
     articleService.SearchPageCount = searchPageCount;
     articleService.SkipThreshhold = skipThreshhold;
+    articleService.TrimLength = trimLength;
 
     return articleService;
 });
