@@ -3,6 +3,15 @@
 @{
 }
 
+@{
+	var offsetNum = 0;
+	var offset = this.HttpContext.Request.Cookies["offset"];
+	if (offset != null)
+	{
+		offsetNum = Convert.ToInt32(offset);
+	}
+}
+
 <form method="POST">
 	<div>
 		Article Id: <input name="id" />
@@ -44,7 +53,7 @@
 				<tr>
 					<td rowspan="2"><img src="@article.ImageUrl" /></td>
 					<td><a href="@article.ArticleUrl" target="_blank" rel="noopener noreferrer">@article.ArticleId</a></td>
-					<td>@article.Time.ToLocalTime()</td>
+					<td>@article.Time.AddMinutes(offsetNum)</td>
 					<td>@article.ReplyCount</td>
 					<td>@article.CommentCount</td>
 				</tr>
