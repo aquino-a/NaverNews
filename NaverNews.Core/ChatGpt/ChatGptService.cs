@@ -40,7 +40,7 @@ namespace NaverNews.Core
             {
                 FrequencyPenalty = 0,
                 MaxTokens = 500,
-                Model = "gpt-3.5-turbo-16k",
+                Model = "gpt-3.5-turbo",
                 PresencePenalty = 0,
                 Temperature = 0,
                 TopP = 0,
