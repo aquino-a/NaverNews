@@ -145,8 +145,10 @@ namespace NaverNews.Core
             var articles = await _client.GetArticles(type, pages);
             articles = articles.Where(a => a.Total >= SkipThreshhold).ToList();
 
-            articles.ForEach(a =>
+            for (int i = 0; i < articles.Count; i++)
             {
+                var a = articles[i];
+
                 var existingArticle = _articleContext.Find<Article>(a.ArticleId);
                 if (existingArticle == null)
                 {
@@ -156,8 +158,9 @@ namespace NaverNews.Core
                 {
                     existingArticle.CommentCount = a.CommentCount;
                     existingArticle.ReplyCount = a.ReplyCount;
+                    articles[i] = existingArticle;
                 }
-            });
+            }
 
             var changeCount = await _articleContext.SaveChangesAsync();
             searchResult.Count = changeCount;
