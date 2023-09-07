@@ -54,9 +54,16 @@ namespace NaverNews.Core
             _logger.LogInformation($"Found {articles.Count} articles that meet the minimum. [{EngagementMinimum}]");
 
             await _twitterClient.Refresh();
-            foreach (var article in articles)
+            try
             {
-                await AutoPost(article);
+                foreach (var article in articles)
+                {
+                    await AutoPost(article);
+                }
+            }
+            finally
+            {
+                await _articleContext.SaveChangesAsync();
             }
         }
 
@@ -71,7 +78,14 @@ namespace NaverNews.Core
 
             // used only from controller where one is posted.
             await _twitterClient.Refresh();
-            await AutoPost(existingArticle);
+            try
+            {
+                await AutoPost(existingArticle);
+            }
+            finally
+            {
+                await _articleContext.SaveChangesAsync();
+            }
         }
 
         public async Task<string> GetArticleText(string articleId)
@@ -82,7 +96,10 @@ namespace NaverNews.Core
                 throw new ArticleNotFoundException();
             }
 
-            return await GetArticleText(article);
+            var text = await GetArticleText(article);
+            await _articleContext.SaveChangesAsync();
+
+            return text;
         }
 
         public IEnumerable<Article> GetByTimeAndTotal(DateTime olderThan, int minimumTotal = 10, int count = 20)
@@ -110,7 +127,10 @@ namespace NaverNews.Core
                 throw new ArticleNotFoundException();
             }
 
-            return await GetSummary(article);
+            var summary = await GetSummary(article);
+            await _articleContext.SaveChangesAsync();
+
+            return summary;
         }
 
         public async Task<string> Post(string articleId)
@@ -202,7 +222,6 @@ namespace NaverNews.Core
                     _logger.LogError($"Translated summary couldn't be trimmed [{translatedSummary.Length}]");
                     article.WasAutoPosted = true;
                     article.TwitterId = "trim fail";
-                    await _articleContext.SaveChangesAsync();
 
                     return;
                 }
@@ -221,7 +240,6 @@ namespace NaverNews.Core
             article.WasAutoPosted = true;
             article.TwitterId = id;
             article.IsOnTwitter = true;
-            await _articleContext.SaveChangesAsync();
 
             _logger.LogInformation($"Posted article ({article.ArticleUrl}) to twitter. ({article.TwitterId})");
         }
@@ -236,7 +254,6 @@ namespace NaverNews.Core
             var text = await _client.GetArticleText(article);
 
             article.Text = HttpUtility.HtmlDecode(text);
-            await _articleContext.SaveChangesAsync();
 
             return text;
         }
@@ -272,7 +289,6 @@ namespace NaverNews.Core
             var summary = await _chatGptService.Summarize(article.Text);
 
             article.TranslatedSummary = summary;
-            await _articleContext.SaveChangesAsync();
 
             return summary;
         }
