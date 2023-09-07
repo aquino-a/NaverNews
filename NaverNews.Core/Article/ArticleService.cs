@@ -145,20 +145,26 @@ namespace NaverNews.Core
             var articles = await _client.GetArticles(type, pages);
             articles = articles.Where(a => a.Total >= SkipThreshhold).ToList();
 
+            var articleIds = articles.Select(a => a.ArticleId).ToArray();
+            var existingArticles = _articleContext.Articles
+                .Where(a => articleIds.Contains(a.ArticleId))
+                .ToDictionary(a => a.ArticleId);
+
             for (int i = 0; i < articles.Count; i++)
             {
                 var a = articles[i];
 
-                var existingArticle = _articleContext.Find<Article>(a.ArticleId);
-                if (existingArticle == null)
+                if (existingArticles.ContainsKey(a.ArticleId))
                 {
-                    _articleContext.Add(a);
-                }
-                else
-                {
+                    var existingArticle = existingArticles[a.ArticleId];
+
                     existingArticle.CommentCount = a.CommentCount;
                     existingArticle.ReplyCount = a.ReplyCount;
                     articles[i] = existingArticle;
+                }
+                else
+                {
+                    _articleContext.Add(a);
                 }
             }
 
