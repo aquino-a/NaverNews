@@ -10,6 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="7.0.10" />
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="7.0.10" />
+    <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="2.1.175" />
   </ItemGroup>
 
   <ItemGroup>
