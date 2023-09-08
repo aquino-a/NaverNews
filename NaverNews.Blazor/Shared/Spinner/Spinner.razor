@@ -1,0 +1,34 @@
+﻿@namespace NaverNews.Blazor
+@inject SpinnerService SpinnerService
+
+@if (isVisible)
+{
+    <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center bg-dark opacity-75">
+        <div class="spinner-border text-light" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+    </div>
+}
+
+@code
+{
+    protected bool isVisible { get; set; }
+
+    protected override void OnInitialized()
+    {
+        SpinnerService.OnShow += ShowSpinner;
+        SpinnerService.OnHide += HideSpinner;
+    }
+
+    public void ShowSpinner()
+    {
+        isVisible = true;
+        StateHasChanged();
+    }
+
+    public void HideSpinner()
+    {
+        isVisible = false;
+        StateHasChanged();
+    }
+}

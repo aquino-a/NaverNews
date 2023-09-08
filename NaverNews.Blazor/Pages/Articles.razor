@@ -1,0 +1,135 @@
+﻿@page "/articles"
+
+@using NaverNews.Core;
+
+@inject SpinnerService _spinnerService
+@inject IArticleService _articleService
+
+<div>
+	<tr>
+		<td><input type="number" @bind="@_minimumTotal" /></td>
+		<td><input type="number" @bind="@_count" /></td>
+		<td>
+			<input type="submit" @onclick="() => GetArticles(DateTime.UtcNow, _minimumTotal, _count)" value="Refresh" />
+		</td>
+	</tr>
+</div>
+	<table class="table table-dark">
+		<thead>
+			<tr>
+				<th></th>
+				<th></th>
+				<th></th>
+				<th>Reacts</th>
+				<th></th>
+			</tr>
+		</thead>
+		@if (_articles != null)
+		{
+			foreach (var article in _articles)
+			{
+				<tr>
+					<td rowspan="2"><img src="@article.ImageUrl" /></td>
+					<td><a href="@article.ArticleUrl" target="_blank" rel="noopener noreferrer">@article.ArticleId</a></td>
+				<td>@article.Time.AddMinutes(Offset)</td>
+					<td>@article.ReplyCount</td>
+					<td>@article.CommentCount</td>
+				</tr>
+				<tr>
+					<td rowspan="2" colspan="5">@article.Title</td>
+				</tr>
+				<tr>
+					<td>
+						@if (string.IsNullOrWhiteSpace(article.TwitterId))
+						{
+							<form method="POST">
+								<input type="submit" asp-route-id="@article.ArticleId" asp-page-handler="autopost" value="Post" />
+							</form>
+						}
+						else
+						{
+							<a href="https://twitter.com/korean_pulse/status/@article.TwitterId">Twitter Post</a>
+						}
+					</td>
+				</tr>
+				<br />
+			}
+		}
+	</table>
+	<tr>
+		<td>
+		@BackButton
+		</td>
+		<td>
+		@NextButton
+		</td>
+	</tr>
+
+@code {
+	private IEnumerable<Article> _articles;
+	private Stack<DateTime> _timeHistory = new();
+	private DateTime _olderThan;
+	private int _minimumTotal;
+	private int _count;
+
+	[Parameter]
+	[SupplyParameterFromQuery]
+	public DateTime? OlderThan { get; set; }
+
+	[Parameter]
+	[SupplyParameterFromQuery]
+	public int? MinimumTotal { get; set; }
+
+	[Parameter]
+	[SupplyParameterFromQuery]
+	public int? Count { get; set; }
+
+	[CascadingParameter(Name = "offsetNum")]
+	public int Offset { get; set; }
+
+	protected RenderFragment NextButton =>
+	@<div>
+		@if (_articles != null && _articles.Count() > 0)
+			{
+				<input type="submit" @onclick="() => Next(_articles.Last().Time.AddMinutes(-1), _minimumTotal, _count)" value="Next >>" />;
+			}
+		</div>;
+
+	protected RenderFragment BackButton =>
+		@<div>
+			@if (_articles != null && _articles.Count() > 0 && _timeHistory.Count > 0)
+			{
+				<input type="submit" @onclick="() => Back(_minimumTotal, _count)" value="<< Back" />;
+			}
+			</div>
+	;
+
+	protected override void OnInitialized()
+	{
+		_olderThan = OlderThan.GetValueOrDefault(DateTime.UtcNow);
+		_minimumTotal = MinimumTotal.GetValueOrDefault(500);
+		_count = Count.GetValueOrDefault(5);
+
+		GetArticles(_olderThan, _minimumTotal, _count);
+	}
+
+	private void GetArticles(DateTime olderThan, int minimumTotal, int count)
+	{
+		_articles = _articleService.GetByTimeAndTotal(olderThan, minimumTotal, count).ToArray();
+	}
+
+	private void Next(DateTime olderThan, int minimumTotal, int count)
+	{
+		_timeHistory.Push(_olderThan);
+		_olderThan = olderThan;
+
+		GetArticles(_olderThan, minimumTotal, count);
+	}
+
+	private void Back(int minimumTotal, int count)
+	{
+		_olderThan = _timeHistory.Pop();
+
+		GetArticles(_olderThan, minimumTotal, count);
+	}
+}

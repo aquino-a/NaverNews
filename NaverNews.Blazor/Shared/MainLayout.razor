@@ -1,0 +1,54 @@
+﻿@inherits LayoutComponentBase
+@inject HttpContextAccessor _httpAccessor
+
+@{
+    var offsetNum = 0;
+    var offset = _httpAccessor?.HttpContext?.Request.Cookies["offset"];
+    if (offset != null)
+    {
+        offsetNum = Convert.ToInt32(offset);
+    }
+}
+
+<PageTitle>NaverNews.Blazor</PageTitle>
+
+
+<nav class="navbar navbar-expand-sm navbar-toggleable-sm border-bottom box-shadow mb-3">
+    <div class="container">
+        <NavLink class="navbar-brand" href="/">NaverNews.Web</NavLink>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+            <ul class="navbar-nav flex-grow-1">
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="">Home</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/Articles">Articles</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/Search">Search</NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink class="nav-link" href="/Privacy">Privacy</NavLink>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="page">
+    <div class="container">
+
+        <main>
+            <article class="content px-4">
+                <CascadingValue Value="@offsetNum" Name="offsetNum">
+                @Body
+                </CascadingValue>
+                    <Spinner />
+            </article>
+        </main>
+    </div>
+</div>

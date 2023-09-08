@@ -1,0 +1,50 @@
+﻿@page "/search"
+
+@using NaverNews.Core;
+
+@inject IArticleService _articleService
+
+<div>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>Start</th>
+				<th>End</th>
+				<th>#</th>
+			</tr>
+		</thead>
+		@if (_searchResults != null && _searchResults.Count() > 0)
+		{
+			foreach (var searchResult in _searchResults)
+			{
+				<tr>
+					<td>@searchResult.StartTime.AddMinutes(Offset)</td>
+					<td>
+						@if (searchResult.EndTime != default(DateTime))
+						{
+							@searchResult.EndTime.AddMinutes(Offset)
+						}
+					</td>
+					<td>@searchResult.Count</td>
+				</tr>
+			}
+		}
+	</table>
+</div>
+
+@code {
+	private IEnumerable<SearchResult> _searchResults;
+
+	[Parameter]
+	[SupplyParameterFromQuery]
+	public int? Count { get; set; }
+
+	[CascadingParameter(Name = "offsetNum")]
+	public int Offset { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		_searchResults = (await _articleService.GetSearchResults(DateTime.UtcNow, Count.GetValueOrDefault(10)))
+			.ToArray();
+	}
+}
