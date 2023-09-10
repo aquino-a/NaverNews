@@ -42,16 +42,14 @@
 					<td>
 						@if (string.IsNullOrWhiteSpace(article.TwitterId))
 						{
-							<form method="POST">
-								<input type="submit" asp-route-id="@article.ArticleId" asp-page-handler="autopost" value="Post" />
-							</form>
+							<input type="submit" @onclick="() => PostArticle(article.ArticleId)" value="Post" />
 						}
 						else
 						{
 							<a href="https://twitter.com/korean_pulse/status/@article.TwitterId">Twitter Post</a>
 						}
 					</td>
-				</tr>
+				</tr> 
 				<br />
 			}
 		}
@@ -131,5 +129,22 @@
 		_olderThan = _timeHistory.Pop();
 
 		GetArticles(_olderThan, minimumTotal, count);
+	}
+
+	private async Task PostArticle(string articleId)
+	{
+		try
+		{
+			_spinnerService.Show();
+			await _articleService.AutoPost(articleId);
+		}
+		catch (ArticleNotFoundException e)
+		{
+			throw;
+		} 
+		finally
+		{
+			_spinnerService.Hide();	
+		}
 	}
 }
