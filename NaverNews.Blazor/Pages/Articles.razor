@@ -42,7 +42,7 @@
 					<td>
 						@if (string.IsNullOrWhiteSpace(article.TwitterId))
 						{
-							<input type="submit" @onclick="() => PostArticle(article.ArticleId)" value="Post" />
+							<input type="submit" class="btn btn-primary" @onclick="() => PostArticle(article.ArticleId)" value="Post" />
 						}
 						else
 						{
