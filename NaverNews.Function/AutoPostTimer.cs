@@ -7,11 +7,13 @@ namespace NaverNews.Function
     public class AutoPostTimer
     {
         private readonly IArticleService _articleService;
+        private readonly ArticleDbContext _articleContext;
         private readonly ILogger _logger;
 
-        public AutoPostTimer(IArticleService articleService, ILogger<AutoPostTimer> logger)
+        public AutoPostTimer(IArticleService articleService, ArticleDbContext articleContext, ILogger<AutoPostTimer> logger)
         {
             _articleService = articleService;
+            _articleContext = articleContext;
             _logger = logger;
         }
 
@@ -27,6 +29,8 @@ namespace NaverNews.Function
             {
                 _logger.LogError(e, "Problem autoposting articles.");
             }
+
+            await _articleContext.DeleteOld();
         }
     }
 }
