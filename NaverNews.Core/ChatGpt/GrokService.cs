@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json.Nodes;
+using System.Text.Json.Serialization;
 
 namespace NaverNews.Core
 {
@@ -56,23 +57,19 @@ namespace NaverNews.Core
         {
             return new Body
             {
-                FrequencyPenalty = 0,
-                MaxTokens = 500,
                 Model = "gpt-3.5-turbo",
-                PresencePenalty = 0,
                 Temperature = 0,
-                TopP = 0,
                 Messages = new List<Message>
                 {
                     new Message
                     {
                         Role = "system",
-                        Content = systemContent
+                        Content = systemContent,
                     },
                     new Message
                     {
                         Role = "user",
-                        Content = userContent
+                        Content = userContent,
                     },
                 },
             };
@@ -93,10 +90,19 @@ namespace NaverNews.Core
 //         "stream": false,
 //         "temperature": 0
 //       }'
-        private class Body 
+        private class Body
         {
-            public int MyProperty { get; set; }
+            [JsonPropertyName("messages")]
+            public List<Message> Messages { get; set; }
 
+            [JsonPropertyName("model")]
+            public string Model { get; set; }
+
+            [JsonPropertyName("stream")]
+            public bool Stream { get; set; }
+
+            [JsonPropertyName("temperature")]
+            public int Temperature { get; set; }
         }
     }
 }
