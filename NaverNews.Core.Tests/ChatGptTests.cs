@@ -25,6 +25,7 @@ namespace NaverNews.Core.Tests
         public async Task KeyTest()
         {
             var apiKey = _configuration["ChatGpt:ApiKey"];
+            Assert.That(apiKey, Is.Not.Null);
             Assert.That(apiKey, Is.Not.Empty);
         }
 
