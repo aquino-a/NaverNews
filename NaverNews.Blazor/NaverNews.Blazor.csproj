@@ -8,6 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Cosmos" Version="8.0.15" />
     <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="8.0.15" />
+    <PackageReference Include="Microsoft.Web.LibraryManager.Build" Version="3.0.71" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NaverNews.Core\NaverNews.Core.csproj" />
