@@ -17,6 +17,7 @@ var engagementMinimum = Convert.ToInt32(Environment.GetEnvironmentVariable("Arti
 var searchPageCount = Convert.ToInt32(Environment.GetEnvironmentVariable("Article:searchPageCount"));
 var skipThreshhold = Convert.ToInt32(Environment.GetEnvironmentVariable("Article:skipThreshhold"));
 var trimLength = Convert.ToInt32(Environment.GetEnvironmentVariable("Article:trimLength"));
+var chatGptModel = Environment.GetEnvironmentVariable("ChatGpt:model") ?? "gpt-3.5-turbo";
 
 var builder = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
@@ -45,7 +46,7 @@ var builder = new HostBuilder()
         s.AddDbContext<TokenDbContext>(options => options.UseCosmos(connectionString, "news"), ServiceLifetime.Transient, ServiceLifetime.Transient);
         s.AddTransient<HttpClient>();
         s.AddScoped<NaverClient>();
-        s.AddScoped<IChatGptService, ChatGptService>(sp => new ChatGptService(sp.GetRequiredService<HttpClient>(), chatGptApiKey));
+        s.AddScoped<IChatGptService, ChatGptService>(sp => new ChatGptService(sp.GetRequiredService<HttpClient>(), chatGptApiKey, chatGptModel));
         s.AddSingleton<TokenService>(sp =>
         {
             var tokenService = new TokenService(twitterClientId,

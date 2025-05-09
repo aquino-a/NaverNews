@@ -10,11 +10,13 @@ namespace NaverNews.Core
         private const string SUMMARIZE_SYSTEM = "use headlinese to concisely shorten the article to less than 35 words with short English sentences.";
 
         private readonly HttpClient _httpClient;
+        private readonly string _modelName;
 
-        public ChatGptService(HttpClient httpClient, string apiKey)
+        public ChatGptService(HttpClient httpClient, string apiKey, string modelName = "gpt-3.5-turbo")
         {
             _httpClient = httpClient;
             _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
+            _modelName = modelName;
         }
 
         public async Task<string> Summarize(string text)
@@ -40,7 +42,7 @@ namespace NaverNews.Core
             {
                 FrequencyPenalty = 0,
                 MaxTokens = 500,
-                Model = "gpt-3.5-turbo",
+                Model = _modelName,
                 PresencePenalty = 0,
                 Temperature = 0,
                 TopP = 0,
