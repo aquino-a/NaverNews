@@ -1,11 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Azure.Functions.Worker;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NaverNews.Core;
 using NaverNews.Function;
 
-FunctionsAssemblyResolver.RedirectAssembly();
+//FunctionsAssemblyResolver.RedirectAssembly();
 
 var connectionString = Environment.GetEnvironmentVariable("Cosmos-Connection") ?? throw new InvalidOperationException("Connection string 'Cosmos-Connection' not found.");
 var chatGptApiKey = Environment.GetEnvironmentVariable("ChatGpt:apiKey") ?? throw new InvalidOperationException("ChatGpt Api key 'ChatGpt:apiKey' not found.");
@@ -21,6 +22,8 @@ var builder = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
     .ConfigureServices(s =>
     {
+        s.AddApplicationInsightsTelemetryWorkerService();
+        s.ConfigureFunctionsApplicationInsights();
         s.AddScoped<IArticleService, ArticleService>(sp =>
         {
             var articleService = new ArticleService(

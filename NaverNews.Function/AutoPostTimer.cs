@@ -18,7 +18,7 @@ namespace NaverNews.Function
         }
 
         [Function("AutoPostTimer")]
-        public async Task Run([TimerTrigger("0 0 */4 * * *")] TimerInfo timerInfo)
+        public async Task Run([TimerTrigger("0 0 */1 * * *")] TimerInfo timerInfo)
         {
             _logger.LogInformation($"C# Timer trigger function executed at: {DateTime.Now}");
             try
