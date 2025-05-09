@@ -30,6 +30,7 @@ jobs:
       with:
         name: functionapp
         path: ${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}
+        include-hidden-files: true
   deploy:
     runs-on: windows-latest
     needs: build
