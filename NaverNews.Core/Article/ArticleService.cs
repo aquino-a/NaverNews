@@ -58,7 +58,14 @@ namespace NaverNews.Core
             {
                 foreach (var article in articles)
                 {
-                    await AutoPost(article);
+                    try
+                    {
+                        await AutoPost(article);
+                    }
+                    catch (System.Exception e)
+                    {
+                        _logger.LogError(e, $"Problem with auto posting article #: {article.ArticleId}");
+                    }
                 }
             }
             finally
