@@ -278,7 +278,7 @@ namespace NaverNews.Core
         {
             if (string.IsNullOrWhiteSpace(article.Text))
             {
-                throw new ArticleTextNotReadyException();
+                throw new ArticleTextNotReadyException(article);
             }
 
             if (!string.IsNullOrWhiteSpace(article.TranslatedSummary))
